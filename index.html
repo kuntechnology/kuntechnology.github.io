@@ -142,6 +142,10 @@
       h2 { font-size: 22px; }
       footer { margin-top: 38px; }
     }
+    @media (max-width: 360px) {
+      .top-note { font-size: 0; letter-spacing: 0; }
+      .top-note::after { content: "项目导航"; font-size: 9px; letter-spacing: .08em; }
+    }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
