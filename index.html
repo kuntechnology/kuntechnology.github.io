@@ -10,7 +10,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta property="og:type" content="website">
   <meta property="og:title" content="数字现场 · Kuntechnology">
-  <meta property="og:description" content="五条项目路径，四份不同内容。一张可交互的数字星图。">
+  <meta property="og:description" content="四个不重复项目入口。一张可交互的数字星图。">
   <meta property="og:url" content="https://kuntechnology.github.io/">
   <title>数字现场 · Kuntechnology</title>
   <style>
@@ -27,7 +27,6 @@
       --cyan: #6ce8ff;
       --pink: #ff77ba;
       --violet: #a89cff;
-      --orange: #ffb86b;
       --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       --max: 1180px;
@@ -133,10 +132,6 @@
     .card-foot { margin-top: auto; padding-top: 18px; color: var(--accent); font-size: 10px; font-weight: 700; }
     .card-foot .launch { width: 26px; height: 26px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--accent), transparent 62%); border-radius: 50%; font-size: 14px; transition: transform .2s, background .2s; }
     .project-card:hover .launch, .project-card:focus-visible .launch { transform: translate(2px,-2px); background: color-mix(in srgb, var(--accent), transparent 88%); }
-    .mirror-card { --accent: var(--orange); border-style: dashed; }
-    .mirror-card::before { background: repeating-linear-gradient(90deg, var(--accent) 0 5px, transparent 5px 9px); }
-    .mirror-mark { display: inline-flex; align-items: center; gap: 6px; color: var(--orange); }
-    .mirror-mark svg { width: 12px; height: 12px; }
     .results-note { min-height: 23px; margin: 12px 2px 0; color: var(--muted); font-size: 11px; }
     .footnote { display: flex; align-items: start; gap: 11px; margin-top: 18px; padding: 14px 16px; border: 1px solid rgba(108,232,255,.18); border-radius: 8px; background: rgba(7,22,31,.52); color: #aebccc; font-size: 11px; line-height: 1.75; }
     .footnote svg { flex: 0 0 auto; margin-top: 2px; color: var(--cyan); }
@@ -199,7 +194,7 @@
       <span class="brand-symbol" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2.5 21.5 8v8L12 21.5 2.5 16V8L12 2.5Z" stroke="currentColor" stroke-width="1.3"/><path d="m9 8 4 4-4 4m4-4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       <span class="brand-name">KUNTECHNOLOGY</span>
     </a>
-    <div class="top-meta"><span class="pulse">STATIC / 05 ROUTES</span><span class="top-index">DIGITAL FIELD NOTES&nbsp; · &nbsp;01</span></div>
+    <div class="top-meta"><span class="pulse">STATIC / 04 ROUTES</span><span class="top-index">DIGITAL FIELD NOTES&nbsp; · &nbsp;01</span></div>
   </header>
 
   <main id="main" class="wrap">
@@ -213,14 +208,14 @@
           <a class="text-link" href="https://github.com/kuntechnology/kuntechnology.github.io" target="_blank" rel="noopener noreferrer">查看首页源码 ↗<span class="sr-only">（新标签页打开）</span></a>
         </div>
         <div class="hero-facts" aria-label="项目统计">
-          <div class="fact"><strong>05</strong><span>公开访问路径</span></div>
+          <div class="fact"><strong>04</strong><span>公开访问路径</span></div>
           <div class="fact"><strong>04</strong><span>不同项目内容</span></div>
           <div class="fact"><strong>00</strong><span>外部运行依赖</span></div>
         </div>
       </div>
 
       <div class="map-panel" id="project-map" aria-label="项目关系星图">
-        <div class="map-head"><span>FIELD MAP&nbsp; / &nbsp;PROJECT ROUTES</span><span class="map-count">05 NODES</span></div>
+        <div class="map-head"><span>FIELD MAP&nbsp; / &nbsp;PROJECT ROUTES</span><span class="map-count">04 NODES</span></div>
         <svg class="map-svg" viewBox="0 0 620 438" role="group" aria-label="可交互项目星图；选择节点可打开对应项目">
           <ellipse class="orbit orbit-1" cx="310" cy="218" rx="246" ry="151"/>
           <ellipse class="orbit orbit-2" cx="310" cy="218" rx="202" ry="114" transform="rotate(-27 310 218)"/>
@@ -228,7 +223,6 @@
           <path class="link-line" data-project="design" d="M310 218 139 112"/>
           <path class="link-line" data-project="utility" d="M310 218 480 112"/>
           <path class="link-line" data-project="defense" d="M310 218 135 323"/>
-          <path class="link-line" data-project="mirror" d="M310 218 310 354"/>
           <path class="link-line" data-project="learning" d="M310 218 487 322"/>
           <circle class="map-core-glow" cx="310" cy="218" r="42"/>
           <circle class="map-core" cx="310" cy="218" r="28"/>
@@ -243,28 +237,25 @@
           <a class="node-link" data-project="defense" style="--node:#6ce8ff" href="https://kuntechnology.github.io/Das-security/" target="_blank" rel="noopener noreferrer" aria-label="打开安恒信息安全服务方案，新标签页">
             <title>打开安恒信息安全服务方案（新标签页）</title><circle class="node-dot" cx="135" cy="323" r="5" fill="#6ce8ff"/><rect class="node-box" x="36" y="333" width="170" height="37" rx="6"/><text class="node-title" x="48" y="349">安恒信息安全方案</text><text class="node-type" x="48" y="362">SECURITY / SERVICE</text>
           </a>
-          <a class="node-link" data-project="mirror" style="--node:#ffb86b" href="https://kuntechnology.github.io/Kuntech/" target="_blank" rel="noopener noreferrer" aria-label="打开 Kuntech 安全方案镜像备用入口，内容与安恒信息安全方案相同，新标签页">
-            <title>Kuntech 安全方案镜像 / 备用入口，内容与安恒方案相同（新标签页）</title><circle class="node-dot" cx="310" cy="354" r="5" fill="#ffb86b"/><rect class="node-box" x="232" y="373" width="156" height="37" rx="6"/><text class="node-title" x="244" y="389">Kuntech · 镜像入口</text><text class="node-type" x="244" y="402">BACKUP / SAME CONTENT</text>
-          </a>
           <a class="node-link" data-project="learning" style="--node:#cbff65" href="https://kuntechnology.github.io/sftp-visualization-guide/" target="_blank" rel="noopener noreferrer" aria-label="打开 SFTP 安全传输可视化指南，新标签页">
             <title>打开 SFTP 安全传输可视化指南（新标签页）</title><circle class="node-dot" cx="487" cy="322" r="5" fill="#cbff65"/><rect class="node-box" x="414" y="333" width="177" height="37" rx="6"/><text class="node-title" x="426" y="349">SFTP 可视化指南</text><text class="node-type" x="426" y="362">LEARN / INTERACTIVE</text>
           </a>
         </svg>
       </div>
-      <div class="mobile-map-note"><span><strong>星图已折叠为清晰纵向目录</strong></span><span aria-hidden="true">↓ 05 ROUTES</span></div>
+      <div class="mobile-map-note"><span><strong>星图已折叠为清晰纵向目录</strong></span><span aria-hidden="true">↓ 04 ROUTES</span></div>
     </section>
 
     <section id="projects" class="section" aria-labelledby="projects-heading">
       <div class="section-top">
-        <div><p class="section-kicker">01 — 05&nbsp; / &nbsp;SELECT A SIGNAL</p><h2 id="projects-heading">选择一条路径</h2><p class="section-intro">每个节点通向一个公开项目。悬停或聚焦卡片，可在星图中追踪对应信号。</p></div>
-        <div class="section-count"><strong id="visible-count">05</strong> <span>/ 05 PATHS</span></div>
+        <div><p class="section-kicker">01 — 04&nbsp; / &nbsp;SELECT A SIGNAL</p><h2 id="projects-heading">选择一条路径</h2><p class="section-intro">每个节点通向一个公开项目。悬停或聚焦卡片，可在星图中追踪对应信号。</p></div>
+        <div class="section-count"><strong id="visible-count">04</strong> <span>/ 04 PATHS</span></div>
       </div>
       <div class="toolbar" aria-label="项目筛选工具">
         <div class="filters" role="group" aria-label="按类型筛选项目">
-          <button class="filter-btn" type="button" data-filter="all" aria-pressed="true">全部 <span>(5)</span></button>
+          <button class="filter-btn" type="button" data-filter="all" aria-pressed="true">全部 <span>(4)</span></button>
           <button class="filter-btn" type="button" data-filter="design" aria-pressed="false">设计 <span>(1)</span></button>
           <button class="filter-btn" type="button" data-filter="tools" aria-pressed="false">工具 <span>(1)</span></button>
-          <button class="filter-btn" type="button" data-filter="security" aria-pressed="false">安全 / 指南 <span>(3)</span></button>
+          <button class="filter-btn" type="button" data-filter="security" aria-pressed="false">安全 / 指南 <span>(2)</span></button>
         </div>
         <label class="search-wrap"><span class="sr-only">搜索项目名称或说明</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="m12.5 12.5 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><input id="project-search" class="search" type="search" placeholder="搜索项目…" autocomplete="off"><span class="shortcut" aria-hidden="true">/</span></label>
       </div>
@@ -278,15 +269,12 @@
         <a class="project-card" data-project="defense" data-category="security" href="https://kuntechnology.github.io/Das-security/" target="_blank" rel="noopener noreferrer" style="--accent:#6ce8ff" aria-label="打开安恒信息安全服务方案，新标签页">
           <div class="card-head"><span>NODE / 03</span><span class="card-signal">SERVICE SIGNAL</span></div><h3 class="card-title">安恒信息安全服务方案</h3><p class="card-desc">金融行业安全服务展示，介绍合规检测、自动化测试与相关服务案例。</p><div class="card-foot"><span>查看安全方案 <span class="sr-only">（新标签页打开）</span></span><span class="launch" aria-hidden="true">↗</span></div>
         </a>
-        <a class="project-card mirror-card" data-project="mirror" data-category="security" href="https://kuntechnology.github.io/Kuntech/" target="_blank" rel="noopener noreferrer" style="--accent:#ffb86b" aria-label="打开 Kuntech 安全方案镜像备用入口；内容与安恒信息安全服务方案相同，新标签页">
-          <div class="card-head"><span>NODE / 04</span><span class="mirror-mark"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 5 3 8l3 3m4-6 3 3-3 3M9.5 3.5l-3 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>MIRROR / BACKUP</span></div><h3 class="card-title">Kuntech 安全方案页</h3><p class="card-desc">镜像 / 备用访问地址；页面内容与 NODE 03 的安恒信息安全方案相同，并非独立方案。</p><div class="card-foot"><span>打开镜像备用入口 <span class="sr-only">（新标签页打开）</span></span><span class="launch" aria-hidden="true">↗</span></div>
-        </a>
         <a class="project-card" data-project="learning" data-category="security" href="https://kuntechnology.github.io/sftp-visualization-guide/" target="_blank" rel="noopener noreferrer" style="--accent:#cbff65" aria-label="打开 SFTP 安全传输可视化指南，新标签页">
-          <div class="card-head"><span>NODE / 05</span><span class="card-signal">LEARNING SIGNAL</span></div><h3 class="card-title">SFTP 安全传输可视化指南</h3><p class="card-desc">通过交互图示了解 SFTP、SSH 加密隧道与协议解析限制。</p><div class="card-foot"><span>开始交互学习 <span class="sr-only">（新标签页打开）</span></span><span class="launch" aria-hidden="true">↗</span></div>
+          <div class="card-head"><span>NODE / 04</span><span class="card-signal">LEARNING SIGNAL</span></div><h3 class="card-title">SFTP 安全传输可视化指南</h3><p class="card-desc">通过交互图示了解 SFTP、SSH 加密隧道与协议解析限制。</p><div class="card-foot"><span>开始交互学习 <span class="sr-only">（新标签页打开）</span></span><span class="launch" aria-hidden="true">↗</span></div>
         </a>
       </div>
-      <p id="results-note" class="results-note" role="status" aria-live="polite">显示全部 5 条项目路径。</p>
-      <p class="footnote"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.4"/><path d="M10 9v4M10 6.2h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>这是纯静态项目索引；链接分别指向各自的公开页面。本首页不承载后台服务，也不替代项目页面中的说明与限制。Kuntech 链接是安恒方案的镜像 / 备用入口，内容相同。</span></p>
+      <p id="results-note" class="results-note" role="status" aria-live="polite">显示全部 4 条项目路径。</p>
+      <p class="footnote"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.4"/><path d="M10 9v4M10 6.2h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>这是纯静态项目索引，收录四个内容不同的公开入口；链接指向各自独立的 GitHub Pages 页面。本首页不承载后台服务，也不替代项目页面中的说明与限制。</span></p>
     </section>
   </main>
 
