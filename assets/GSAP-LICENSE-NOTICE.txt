@@ -1,0 +1,12 @@
+GSAP 3.15.0 (locally vendored from the official npm package)
+Copyright (c) 2008–2026 GreenSock. All rights reserved.
+
+This file is distributed under the GSAP Standard "No Charge" Software License.
+The license permits use on websites and digital interfaces, including commercial use,
+subject to its terms. It prohibits using GSAP in visual no-code animation builders
+that compete with Webflow's visual animation-building capabilities and requires
+preserving proprietary notices and branding.
+
+Official license: https://gsap.com/community/standard-license/
+Official installation guide: https://gsap.com/docs/v3/Installation/
+Official npm package: https://www.npmjs.com/package/gsap

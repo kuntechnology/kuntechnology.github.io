@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#080b13">
-  <meta name="description" content="Kuntechnology 数字作品集：用一张交互星图探索设计资源、实用工具与技术指南。">
+  <meta name="description" content="Kuntechnology 数字作品集：用可降级 WebGL、Canvas 粒子与交互星图探索设计资源、实用工具与技术指南。">
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://kuntechnology.github.io/">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta property="og:type" content="website">
   <meta property="og:title" content="数字现场 · Kuntechnology">
-  <meta property="og:description" content="四个不重复项目入口。一张可交互的数字星图。">
+  <meta property="og:description" content="四个不重复项目入口。可降级 WebGL、Canvas 粒子与 GSAP 交互星图。">
   <meta property="og:url" content="https://kuntechnology.github.io/">
   <title>数字现场 · Kuntechnology</title>
   <style>
@@ -77,9 +77,18 @@
     .fact + .fact { padding-left: 24px; border-left: 1px solid var(--line); }
     .map-panel { position: relative; min-height: 438px; overflow: hidden; border: 1px solid rgba(148,174,208,.19); border-radius: 14px; background: linear-gradient(145deg, rgba(17,24,40,.94), rgba(9,14,24,.90)); box-shadow: 0 28px 80px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.035); isolation: isolate; }
     .map-panel::before { content: ""; position: absolute; z-index: -1; inset: 0; background: radial-gradient(ellipse at 52% 48%, rgba(58,87,138,.22), transparent 52%), repeating-linear-gradient(0deg, transparent 0 35px, rgba(255,255,255,.018) 36px); pointer-events: none; }
-    .map-head { position: absolute; z-index: 2; top: 18px; left: 21px; right: 21px; display: flex; justify-content: space-between; color: var(--faint); font: 9px var(--mono); letter-spacing: .1em; pointer-events: none; }
+    .map-panel::after { content: ""; position: absolute; z-index: 0; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 50%, rgba(31,83,157,.2), transparent 35%), repeating-radial-gradient(circle at 50% 50%, transparent 0 34px, rgba(108,232,255,.045) 35px 36px, transparent 37px 60px); opacity: .62; }
+    .webgl-canvas { position: absolute; z-index: 1; inset: 0; display: block; width: 100%; height: 100%; opacity: .92; pointer-events: none; transition: opacity .25s ease; }
+    .map-panel[data-renderer="fallback"] .webgl-canvas, .map-panel[data-renderer="context-lost"] .webgl-canvas, .map-panel[data-renderer="static-mobile"] .webgl-canvas { opacity: 0; }
+    .map-head { position: absolute; z-index: 3; top: 18px; left: 21px; right: 21px; display: flex; justify-content: space-between; color: var(--faint); font: 9px var(--mono); letter-spacing: .1em; pointer-events: none; }
     .map-count { color: var(--cyan); }
-    .map-svg { display: block; width: 100%; height: 100%; min-height: 438px; }
+    .map-svg { position: relative; z-index: 2; display: block; width: 100%; height: 100%; min-height: 438px; }
+    .render-readout { position: absolute; z-index: 3; right: 20px; bottom: 13px; left: 20px; display: flex; align-items: center; justify-content: flex-start; gap: clamp(9px, 2vw, 22px); color: #8796ad; font: 8px var(--mono); letter-spacing: .075em; pointer-events: none; }
+    .engine-chip { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .engine-chip::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #647187; }
+    .engine-chip[data-state="live"]::before { background: var(--lime); box-shadow: 0 0 8px rgba(203,255,101,.65); }
+    .engine-chip[data-state="fallback"]::before { background: var(--cyan); }
+    .engine-chip b { color: #d1dbea; font-weight: 500; }
     .orbit { fill: none; stroke: rgba(146,175,219,.15); stroke-width: 1; stroke-dasharray: 2 8; transform-box: fill-box; transform-origin: center; animation: orbit-turn 90s linear infinite; }
     .orbit.orbit-2 { stroke: rgba(107,231,255,.11); stroke-dasharray: 1 9; animation-duration: 120s; animation-direction: reverse; }
     .orbit.orbit-3 { stroke: rgba(168,156,255,.15); stroke-dasharray: none; }
@@ -210,12 +219,18 @@
         <div class="hero-facts" aria-label="项目统计">
           <div class="fact"><strong>04</strong><span>公开访问路径</span></div>
           <div class="fact"><strong>04</strong><span>不同项目内容</span></div>
-          <div class="fact"><strong>00</strong><span>外部运行依赖</span></div>
+          <div class="fact"><strong>00</strong><span>外部网络依赖</span></div>
         </div>
       </div>
 
-      <div class="map-panel" id="project-map" aria-label="项目关系星图">
+      <div class="map-panel" id="project-map" aria-label="项目关系星图" data-renderer="detecting">
+        <canvas id="energy-field" class="webgl-canvas" aria-hidden="true"></canvas>
         <div class="map-head"><span>FIELD MAP&nbsp; / &nbsp;PROJECT ROUTES</span><span class="map-count">04 NODES</span></div>
+        <div class="render-readout" aria-label="实时视觉引擎状态">
+          <span class="engine-chip" id="webgl-engine" data-state="static"><span>WEBGL</span><b id="webgl-value">CHECKING</b></span>
+          <span class="engine-chip" id="gsap-engine" data-state="static"><span>GSAP</span><b id="gsap-value">CHECKING</b></span>
+          <span class="engine-chip" id="canvas-engine" data-state="static"><span>CANVAS</span><b id="canvas-value">CHECKING</b></span>
+        </div>
         <svg class="map-svg" viewBox="0 0 620 438" role="group" aria-label="可交互项目星图；选择节点可打开对应项目">
           <ellipse class="orbit orbit-1" cx="310" cy="218" rx="246" ry="151"/>
           <ellipse class="orbit orbit-2" cx="310" cy="218" rx="202" ry="114" transform="rotate(-27 310 218)"/>
@@ -339,21 +354,25 @@
 
       const canvas = document.getElementById('field');
       const ctx = canvas.getContext('2d', { alpha: true });
+      const diagnostics = window.__kuntechFx || (window.__kuntechFx = {});
+      diagnostics.canvas = { state: ctx ? 'ready' : 'fallback', frames: 0, paused: true };
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
       let width = 0, height = 0, dpr = 1, points = [], frame = 0, lastPaint = 0, active = false;
       let seed = 971;
       const random = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
       function resize() {
         width = window.innerWidth; height = window.innerHeight;
-        dpr = Math.min(window.devicePixelRatio || 1, width < 700 ? 1.15 : 1.5);
+        dpr = Math.min(window.devicePixelRatio || 1, width < 700 ? 1 : 1.25);
         canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
         canvas.style.width = `${width}px`; canvas.style.height = `${height}px`;
-        const amount = Math.max(18, Math.min(width < 700 ? 27 : 48, Math.floor(width * height / 24000)));
+        const amount = Math.max(16, Math.min(width < 700 ? 20 : 36, Math.floor(width * height / 28000)));
         seed = 971; points = Array.from({length: amount}, () => ({x: random()*width, y: random()*height, vx: (random()-.5)*.16, vy: (random()-.5)*.16, r: .6+random()*1.15}));
         paint(0, false);
       }
       function paint(time, move) {
+        if (!ctx) return;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, width, height);
+        if (move) diagnostics.canvas.frames++;
         for (let i=0; i<points.length; i++) {
           const p = points[i];
           if (move) { p.x += p.vx; p.y += p.vy; if (p.x < -8 || p.x > width+8) p.vx *= -1; if (p.y < -8 || p.y > height+8) p.vy *= -1; }
@@ -369,16 +388,18 @@
         if (time-lastPaint >= 34) { paint(time,true); lastPaint=time; }
         frame=requestAnimationFrame(tick);
       }
-      function start() { active=true; if (!reduceMotion.matches && !document.hidden && !frame) frame=requestAnimationFrame(tick); }
-      function stop() { active=false; if (frame) cancelAnimationFrame(frame); frame=0; }
+      function start() { active=Boolean(ctx); diagnostics.canvas.paused=!ctx || reduceMotion.matches || document.hidden; if (active && !reduceMotion.matches && !document.hidden && !frame) { diagnostics.canvas.paused=false; frame=requestAnimationFrame(tick); } }
+      function stop() { active=false; if (frame) cancelAnimationFrame(frame); frame=0; diagnostics.canvas.paused=true; }
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden) { if (frame) cancelAnimationFrame(frame); frame=0; }
-        else if (active && !reduceMotion.matches && !frame) frame=requestAnimationFrame(tick);
+        if (document.hidden) { if (frame) cancelAnimationFrame(frame); frame=0; diagnostics.canvas.paused=true; }
+        else if (active && !reduceMotion.matches && !frame) { diagnostics.canvas.paused=false; frame=requestAnimationFrame(tick); }
       });
-      reduceMotion.addEventListener?.('change', () => { if (reduceMotion.matches) { if (frame) cancelAnimationFrame(frame); frame=0; paint(0,false); } else if (active && !document.hidden && !frame) frame=requestAnimationFrame(tick); });
+      reduceMotion.addEventListener?.('change', () => { if (reduceMotion.matches) { if (frame) cancelAnimationFrame(frame); frame=0; diagnostics.canvas.paused=true; paint(0,false); } else if (active && !document.hidden && !frame) { diagnostics.canvas.paused=false; frame=requestAnimationFrame(tick); } });
       window.addEventListener('resize', resize, {passive:true});
       resize(); start();
     })();
   </script>
+  <script defer src="./assets/gsap-3.15.0.min.js"></script>
+  <script defer src="./assets/visual-effects.js"></script>
 </body>
 </html>
