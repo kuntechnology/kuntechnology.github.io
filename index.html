@@ -3,229 +3,394 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f5f6f2">
-  <meta name="description" content="Kuntechnology 项目导航：直达 UI 设计风格库、输液提醒小助手、安全服务方案与 SFTP 交互指南。">
+  <meta name="theme-color" content="#080b13">
+  <meta name="description" content="Kuntechnology 数字作品集：用一张交互星图探索设计资源、实用工具与技术指南。">
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://kuntechnology.github.io/">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="项目导航 · Kuntechnology">
-  <meta property="og:description" content="精选工具、设计资源与交互式技术指南，一页直达。">
+  <meta property="og:title" content="数字现场 · Kuntechnology">
+  <meta property="og:description" content="五条项目路径，四份不同内容。一张可交互的数字星图。">
   <meta property="og:url" content="https://kuntechnology.github.io/">
-  <title>项目导航 · Kuntechnology</title>
+  <title>数字现场 · Kuntechnology</title>
   <style>
     :root {
-      color-scheme: light;
-      --paper: #f5f6f2;
-      --surface: #ffffff;
-      --ink: #14221f;
-      --muted: #63716c;
-      --line: #e5e9e4;
-      --green: #174d3b;
-      --green-soft: #e8f1eb;
-      --lime: #d9f078;
-      --shadow: 0 18px 50px rgba(24, 48, 39, .07);
-      --radius: 22px;
+      color-scheme: dark;
+      --void: #080b13;
+      --panel: #0e1320;
+      --panel-hi: #121a2a;
+      --ink: #f2f4f7;
+      --muted: #a1aec1;
+      --faint: #748198;
+      --line: rgba(188, 205, 232, .15);
+      --lime: #cbff65;
+      --cyan: #6ce8ff;
+      --pink: #ff77ba;
+      --violet: #a89cff;
+      --orange: #ffb86b;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --max: 1180px;
     }
     *, *::before, *::after { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
     body {
-      margin: 0;
-      min-width: 320px;
-      background:
-        radial-gradient(ellipse at 88% 4%, rgba(218, 235, 198, .42), transparent 29rem),
-        var(--paper);
-      color: var(--ink);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      -webkit-font-smoothing: antialiased;
+      min-width: 320px; margin: 0; overflow-x: hidden; color: var(--ink); background: var(--void);
+      font-family: var(--sans); -webkit-font-smoothing: antialiased;
+      background-image: radial-gradient(ellipse at 78% 10%, rgba(54, 46, 114, .23), transparent 36rem),
+        radial-gradient(ellipse at 8% 42%, rgba(24, 84, 103, .12), transparent 38rem),
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: auto, auto, 54px 54px, 54px 54px;
+      background-position: center, center, center top, center top;
     }
     a { color: inherit; }
-    a:focus-visible { outline: 3px solid #68a883; outline-offset: 4px; }
-    .wrap { width: min(1120px, calc(100% - 56px)); margin-inline: auto; }
-    .topbar {
-      min-height: 78px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(20, 34, 31, .09);
+    button, input { font: inherit; }
+    a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--lime); outline-offset: 4px; }
+    .skip-link { position: fixed; z-index: 20; top: 12px; left: 12px; padding: 10px 14px; transform: translateY(-160%); border-radius: 8px; background: var(--lime); color: #10140a; font-weight: 800; }
+    .skip-link:focus { transform: translateY(0); }
+    #field { position: fixed; z-index: 0; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: .72; }
+    .wrap { position: relative; z-index: 1; width: min(var(--max), calc(100% - 64px)); margin-inline: auto; }
+    .mono { font-family: var(--mono); }
+    .topbar { min-height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--line); }
+    .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
+    .brand-symbol { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid rgba(203,255,101,.38); border-radius: 10px; background: rgba(203,255,101,.06); color: var(--lime); box-shadow: 0 0 24px rgba(203,255,101,.1); }
+    .brand-name { font-size: 12px; font-weight: 800; letter-spacing: .17em; }
+    .top-meta { display: flex; align-items: center; gap: 20px; color: var(--muted); font: 10px var(--mono); letter-spacing: .08em; }
+    .pulse { display: inline-flex; align-items: center; gap: 9px; color: var(--lime); }
+    .pulse::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 12px currentColor; }
+    .top-index { color: var(--faint); }
+    .hero { display: grid; grid-template-columns: minmax(0, .93fr) minmax(440px, 1.07fr); align-items: center; gap: clamp(32px, 5vw, 72px); padding: 76px 0 78px; }
+    .eyebrow { display: flex; align-items: center; gap: 11px; color: var(--cyan); font: 10px var(--mono); letter-spacing: .17em; text-transform: uppercase; }
+    .eyebrow::before { content: ""; width: 28px; height: 1px; background: currentColor; box-shadow: 0 0 8px currentColor; }
+    h1 { max-width: 640px; margin: 24px 0 22px; font-size: clamp(48px, 6.3vw, 78px); font-weight: 720; letter-spacing: -.075em; line-height: 1.08; }
+    h1 .gradient { color: transparent; background: linear-gradient(100deg, var(--lime) 4%, var(--cyan) 52%, var(--violet) 98%); background-clip: text; -webkit-background-clip: text; }
+    .hero-copy { max-width: 520px; margin: 0; color: #b3bdcd; font-size: 15px; line-height: 1.9; }
+    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; margin-top: 30px; }
+    .button-main { min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 0 18px; border: 1px solid var(--lime); border-radius: 7px; background: var(--lime); color: #11170a; font-size: 12px; font-weight: 850; text-decoration: none; transition: transform .2s ease, box-shadow .2s ease; }
+    .button-main:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(203,255,101,.22); }
+    .text-link { color: var(--muted); font-size: 12px; text-decoration-color: rgba(161,174,193,.4); text-underline-offset: 4px; }
+    .text-link:hover { color: var(--cyan); }
+    .hero-facts { display: flex; gap: 25px; margin-top: 35px; }
+    .fact { display: grid; gap: 4px; }
+    .fact strong { color: var(--ink); font: 700 19px var(--mono); letter-spacing: -.06em; }
+    .fact span { color: var(--faint); font: 9px var(--mono); letter-spacing: .08em; }
+    .fact + .fact { padding-left: 24px; border-left: 1px solid var(--line); }
+    .map-panel { position: relative; min-height: 438px; overflow: hidden; border: 1px solid rgba(148,174,208,.19); border-radius: 14px; background: linear-gradient(145deg, rgba(17,24,40,.94), rgba(9,14,24,.90)); box-shadow: 0 28px 80px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.035); isolation: isolate; }
+    .map-panel::before { content: ""; position: absolute; z-index: -1; inset: 0; background: radial-gradient(ellipse at 52% 48%, rgba(58,87,138,.22), transparent 52%), repeating-linear-gradient(0deg, transparent 0 35px, rgba(255,255,255,.018) 36px); pointer-events: none; }
+    .map-head { position: absolute; z-index: 2; top: 18px; left: 21px; right: 21px; display: flex; justify-content: space-between; color: var(--faint); font: 9px var(--mono); letter-spacing: .1em; pointer-events: none; }
+    .map-count { color: var(--cyan); }
+    .map-svg { display: block; width: 100%; height: 100%; min-height: 438px; }
+    .orbit { fill: none; stroke: rgba(146,175,219,.15); stroke-width: 1; stroke-dasharray: 2 8; transform-box: fill-box; transform-origin: center; animation: orbit-turn 90s linear infinite; }
+    .orbit.orbit-2 { stroke: rgba(107,231,255,.11); stroke-dasharray: 1 9; animation-duration: 120s; animation-direction: reverse; }
+    .orbit.orbit-3 { stroke: rgba(168,156,255,.15); stroke-dasharray: none; }
+    .link-line { fill: none; stroke: rgba(108,232,255,.32); stroke-width: 1; stroke-dasharray: 4 7; animation: signal 7s linear infinite; transition: stroke .25s, opacity .25s, stroke-width .25s; }
+    .map-core-glow { fill: rgba(108,232,255,.06); stroke: rgba(108,232,255,.34); stroke-width: 1; }
+    .map-core { fill: #111b2b; stroke: var(--cyan); stroke-width: 1.2; }
+    .core-mark { fill: var(--cyan); font: 700 12px var(--mono); text-anchor: middle; dominant-baseline: central; }
+    .core-label { fill: #b8c8da; font: 8px var(--mono); letter-spacing: 1.6px; text-anchor: middle; }
+    .node-link { cursor: pointer; text-decoration: none; transition: opacity .2s ease; }
+    .node-box { fill: rgba(14,20,34,.96); stroke: rgba(172,194,225,.27); stroke-width: 1; transition: fill .2s, stroke .2s, filter .2s; }
+    .node-dot { stroke: #0b101b; stroke-width: 3; transition: r .2s, filter .2s; }
+    .node-title { fill: #eff4fb; font: 10px var(--sans); font-weight: 700; }
+    .node-type { fill: #8d9cb2; font: 7px var(--mono); letter-spacing: .7px; }
+    .node-link:hover .node-box, .node-link:focus-visible .node-box, .node-link.is-active .node-box { fill: #17243a; stroke: var(--node); filter: drop-shadow(0 0 8px color-mix(in srgb, var(--node), transparent 52%)); }
+    .node-link:hover .node-dot, .node-link:focus-visible .node-dot, .node-link.is-active .node-dot { r: 7; filter: drop-shadow(0 0 7px var(--node)); }
+    .node-link:focus-visible { outline: none; }
+    .map-panel[data-active] .node-link:not(.is-active) { opacity: .45; }
+    .map-panel[data-active] .link-line:not(.is-active) { opacity: .12; }
+    .link-line.is-active { stroke: var(--lime); stroke-width: 1.7; }
+    .mobile-map-note { display: none; }
+    .section { padding: 32px 0 72px; }
+    .section-top { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 23px; }
+    .section-kicker { margin: 0 0 9px; color: var(--pink); font: 9px var(--mono); letter-spacing: .16em; }
+    h2 { margin: 0; font-size: clamp(24px, 3vw, 31px); letter-spacing: -.05em; }
+    .section-intro { margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .section-count { flex: 0 0 auto; color: var(--faint); font: 10px var(--mono); }
+    .section-count strong { color: var(--lime); font-size: 22px; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 16px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(12,17,29,.8); }
+    .filters { display: flex; flex-wrap: wrap; gap: 7px; }
+    .filter-btn { min-height: 32px; padding: 0 12px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; transition: background .18s, color .18s, border-color .18s; }
+    .filter-btn:hover { border-color: var(--line); color: var(--ink); }
+    .filter-btn[aria-pressed="true"] { border-color: rgba(203,255,101,.38); background: rgba(203,255,101,.09); color: var(--lime); }
+    .search-wrap { position: relative; width: min(280px, 38%); }
+    .search-wrap svg { position: absolute; top: 50%; left: 12px; width: 15px; transform: translateY(-50%); color: var(--faint); pointer-events: none; }
+    .search { width: 100%; min-height: 36px; padding: 0 43px 0 36px; border: 1px solid rgba(188,205,232,.16); border-radius: 6px; background: #090d17; color: var(--ink); font-size: 11px; }
+    .search::placeholder { color: #77849a; }
+    .shortcut { position: absolute; top: 50%; right: 10px; padding: 2px 5px; transform: translateY(-50%); border: 1px solid rgba(188,205,232,.18); border-radius: 4px; color: var(--faint); font: 9px var(--mono); pointer-events: none; }
+    .project-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+    .project-card { --accent: var(--cyan); position: relative; display: flex; min-height: 208px; flex-direction: column; padding: 19px 20px 17px; overflow: hidden; border: 1px solid rgba(176,197,225,.16); border-radius: 10px; background: linear-gradient(140deg, rgba(18,25,41,.92), rgba(12,17,29,.96)); text-decoration: none; transition: transform .22s, border-color .22s, box-shadow .22s, opacity .2s; }
+    .project-card::before { content: ""; position: absolute; top: 0; left: 20px; width: 48px; height: 2px; background: var(--accent); box-shadow: 0 0 14px var(--accent); opacity: .8; }
+    .project-card::after { content: ""; position: absolute; top: -80px; right: -85px; width: 180px; height: 180px; border-radius: 50%; background: var(--accent); opacity: .045; filter: blur(38px); pointer-events: none; }
+    .project-card:hover, .project-card:focus-visible, .project-card.is-active { transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent), transparent 45%); box-shadow: 0 14px 40px rgba(0,0,0,.2), 0 0 24px color-mix(in srgb, var(--accent), transparent 90%); }
+    .project-card[hidden] { display: none; }
+    .card-head, .card-foot { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .card-head { color: var(--faint); font: 9px var(--mono); letter-spacing: .09em; }
+    .card-signal { display: inline-flex; align-items: center; gap: 7px; color: var(--accent); }
+    .card-signal::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+    .card-title { position: relative; z-index: 1; margin: 22px 0 7px; font-size: 19px; font-weight: 680; letter-spacing: -.035em; }
+    .card-desc { position: relative; z-index: 1; max-width: 570px; margin: 0; color: #aab5c7; font-size: 12px; line-height: 1.75; }
+    .card-foot { margin-top: auto; padding-top: 18px; color: var(--accent); font-size: 10px; font-weight: 700; }
+    .card-foot .launch { width: 26px; height: 26px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--accent), transparent 62%); border-radius: 50%; font-size: 14px; transition: transform .2s, background .2s; }
+    .project-card:hover .launch, .project-card:focus-visible .launch { transform: translate(2px,-2px); background: color-mix(in srgb, var(--accent), transparent 88%); }
+    .mirror-card { --accent: var(--orange); border-style: dashed; }
+    .mirror-card::before { background: repeating-linear-gradient(90deg, var(--accent) 0 5px, transparent 5px 9px); }
+    .mirror-mark { display: inline-flex; align-items: center; gap: 6px; color: var(--orange); }
+    .mirror-mark svg { width: 12px; height: 12px; }
+    .results-note { min-height: 23px; margin: 12px 2px 0; color: var(--muted); font-size: 11px; }
+    .footnote { display: flex; align-items: start; gap: 11px; margin-top: 18px; padding: 14px 16px; border: 1px solid rgba(108,232,255,.18); border-radius: 8px; background: rgba(7,22,31,.52); color: #aebccc; font-size: 11px; line-height: 1.75; }
+    .footnote svg { flex: 0 0 auto; margin-top: 2px; color: var(--cyan); }
+    footer { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 19px 0 24px; border-top: 1px solid var(--line); color: var(--faint); font: 9px var(--mono); letter-spacing: .04em; }
+    footer a { color: #a3b3c9; text-decoration: none; }
+    footer a:hover { color: var(--cyan); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    @keyframes signal { to { stroke-dashoffset: -44; } }
+    @keyframes orbit-turn { to { transform: rotate(360deg); } }
+    @media (max-width: 920px) {
+      .wrap { width: min(var(--max), calc(100% - 44px)); }
+      .hero { grid-template-columns: minmax(0, .9fr) minmax(350px, 1.1fr); gap: 28px; padding: 60px 0 58px; }
+      .map-panel, .map-svg { min-height: 390px; }
+      .node-title { font-size: 9px; }
     }
-    .brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; }
-    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; color: var(--green); }
-    .brand-name { font-size: 13px; font-weight: 760; letter-spacing: .12em; }
-    .top-note { color: var(--muted); font-size: 12px; letter-spacing: .08em; }
-    .hero {
-      padding: 78px 0 57px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.28fr) minmax(250px, .72fr);
-      align-items: center;
-      gap: 42px;
-    }
-    .eyebrow {
-      display: inline-flex; align-items: center; gap: 9px;
-      color: var(--green); font-size: 11px; font-weight: 750; letter-spacing: .15em;
-      text-transform: uppercase;
-    }
-    .eyebrow::before { content: ""; width: 24px; height: 1px; background: currentColor; }
-    h1 { max-width: 660px; margin: 18px 0 17px; font-size: clamp(38px, 6.2vw, 68px); line-height: 1.08; letter-spacing: -.055em; font-weight: 740; }
-    h1 span { color: var(--green); }
-    .hero-copy { max-width: 560px; margin: 0; color: var(--muted); font-size: 16px; line-height: 1.9; }
-    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 20px; margin-top: 29px; }
-    .primary-link {
-      min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 12px;
-      padding: 0 18px; border-radius: 999px; background: var(--green); color: #fff;
-      font-size: 13px; font-weight: 680; text-decoration: none; transition: transform .2s ease, background .2s ease;
-    }
-    .primary-link:hover { background: #103c2e; transform: translateY(-2px); }
-    .text-link { color: var(--muted); font-size: 13px; text-decoration: none; }
-    .text-link:hover { color: var(--green); }
-    .hero-art {
-      position: relative; min-height: 230px; display: grid; place-items: center;
-      overflow: hidden; border: 1px solid rgba(23, 77, 59, .10); border-radius: 28px;
-      background: linear-gradient(145deg, #e7efe7 0%, #f1f3e9 58%, #e5ecdd 100%);
-    }
-    .hero-art::before, .hero-art::after { content: ""; position: absolute; border: 1px solid rgba(23,77,59,.13); border-radius: 50%; }
-    .hero-art::before { width: 245px; height: 245px; }
-    .hero-art::after { width: 170px; height: 170px; }
-    .art-orbit { position: absolute; width: 280px; height: 92px; border: 1px solid rgba(23,77,59,.2); border-radius: 50%; transform: rotate(-32deg); }
-    .art-core { position: relative; z-index: 1; width: 92px; height: 92px; display: grid; place-items: center; border-radius: 27px; background: var(--green); color: var(--lime); box-shadow: 0 12px 35px rgba(23,77,59,.18); transform: rotate(-8deg); }
-    .art-dot { position: absolute; z-index: 2; width: 13px; height: 13px; border: 3px solid #f1f3e9; border-radius: 50%; background: #6d9b7e; }
-    .art-dot.one { top: 48px; right: 25%; }
-    .art-dot.two { left: 24%; bottom: 42px; background: #d4e875; }
-    .art-label { position: absolute; right: 20px; bottom: 18px; color: rgba(20,34,31,.55); font-size: 10px; font-weight: 700; letter-spacing: .15em; }
-    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 21px; }
-    .section-kicker { margin: 0 0 8px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-    h2 { margin: 0; font-size: 25px; letter-spacing: -.035em; }
-    .count { color: var(--muted); font-size: 12px; white-space: nowrap; }
-    .count strong { color: var(--ink); font-size: 20px; font-weight: 680; letter-spacing: -.04em; }
-    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-    .card {
-      min-height: 258px; position: relative; display: flex; flex-direction: column;
-      padding: 22px 22px 20px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius);
-      background: var(--surface); text-decoration: none; box-shadow: 0 1px 0 rgba(20,34,31,.02);
-      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
-    }
-    .card:hover { transform: translateY(-4px); border-color: #cbd9ce; box-shadow: var(--shadow); }
-    .card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .card-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 14px; background: var(--green-soft); color: var(--green); }
-    .card-num { color: #9aa59f; font-size: 11px; font-variant-numeric: tabular-nums; letter-spacing: .1em; }
-    .tag { display: inline-flex; align-self: flex-start; margin-top: 21px; padding: 6px 9px; border-radius: 999px; background: #f3f5f1; color: #52635a; font-size: 10px; font-weight: 700; letter-spacing: .05em; }
-    .card h3 { margin: 11px 0 8px; font-size: 19px; line-height: 1.35; letter-spacing: -.035em; }
-    .card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.75; }
-    .card-bottom { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: auto; padding-top: 18px; color: var(--green); font-size: 12px; font-weight: 700; }
-    .arrow { display: grid; width: 29px; height: 29px; place-items: center; border: 1px solid var(--line); border-radius: 50%; transition: transform .2s ease, background .2s ease; }
-    .card:hover .arrow { transform: translate(2px, -2px); background: var(--green-soft); }
-    .mirror-note { margin: 7px 0 0; color: #7c8982; font-size: 11px; line-height: 1.5; }
-    .footnote { display: flex; align-items: start; gap: 11px; margin: 23px 0 0; padding: 15px 17px; border: 1px solid #e1e7df; border-radius: 15px; background: rgba(255,255,255,.52); color: var(--muted); font-size: 12px; line-height: 1.65; }
-    .footnote svg { flex: 0 0 auto; margin-top: 1px; color: var(--green); }
-    footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 54px; padding: 20px 0 25px; border-top: 1px solid rgba(20,34,31,.09); color: #7b8781; font-size: 11px; }
-    footer a { color: inherit; text-decoration: none; }
-    footer a:hover { color: var(--green); }
-    @media (max-width: 860px) {
-      .hero { grid-template-columns: minmax(0, 1fr) minmax(210px, .62fr); gap: 24px; padding-top: 62px; }
-      .hero-art { min-height: 210px; }
-      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media (max-width: 620px) {
-      .wrap { width: min(100% - 36px, 520px); }
-      .topbar { min-height: 66px; }
-      .top-note { font-size: 10px; }
-      .hero { grid-template-columns: 1fr; gap: 28px; padding: 52px 0 44px; }
-      h1 { font-size: clamp(40px, 12vw, 58px); }
+    @media (max-width: 700px) {
+      .wrap { width: min(100% - 36px, 540px); }
+      .topbar { min-height: 68px; }
+      .top-meta { gap: 10px; font-size: 8px; }
+      .top-index { display: none; }
+      .hero { display: flex; flex-direction: column; align-items: stretch; gap: 30px; padding: 52px 0 44px; }
+      h1 { margin: 20px 0 17px; font-size: clamp(45px, 12vw, 65px); }
       .hero-copy { font-size: 14px; }
-      .hero-art { min-height: 180px; }
-      .hero-art::before { width: 200px; height: 200px; }
-      .hero-art::after { width: 140px; height: 140px; }
-      .art-orbit { width: 230px; }
-      .grid { grid-template-columns: 1fr; gap: 12px; }
-      .card { min-height: 236px; padding: 19px; }
-      .section-head { align-items: end; }
-      h2 { font-size: 22px; }
-      footer { margin-top: 38px; }
+      .hero-facts { margin-top: 28px; }
+      .map-panel { display: none; }
+      .mobile-map-note { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid rgba(108,232,255,.2); border-radius: 8px; background: linear-gradient(110deg, rgba(108,232,255,.08), rgba(168,156,255,.05)); color: #aab9cb; font: 9px var(--mono); }
+      .mobile-map-note strong { color: var(--cyan); font-weight: 600; }
+      .section { padding: 24px 0 50px; }
+      .section-top { align-items: end; }
+      .toolbar { align-items: stretch; flex-direction: column; }
+      .filters { gap: 5px; }
+      .filter-btn { padding-inline: 11px; }
+      .search-wrap { width: 100%; }
+      .project-grid { grid-template-columns: 1fr; gap: 10px; }
+      .project-card { min-height: 188px; padding: 17px 17px 15px; }
+      .card-title { margin-top: 18px; }
+      footer { align-items: flex-start; flex-direction: column; padding-bottom: 20px; }
     }
-    @media (max-width: 360px) {
-      .top-note { font-size: 0; letter-spacing: 0; }
-      .top-note::after { content: "项目导航"; font-size: 9px; letter-spacing: .08em; }
+    @media (max-width: 390px) {
+      .brand-name { font-size: 10px; letter-spacing: .12em; }
+      .brand { gap: 8px; }
+      .brand-symbol { width: 30px; height: 30px; }
+      .top-meta { font-size: 7px; }
+      .hero-actions { gap: 12px; }
+      .button-main { padding-inline: 14px; }
+      .fact + .fact { padding-left: 17px; }
+      .section-count { font-size: 8px; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
     }
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <canvas id="field" aria-hidden="true"></canvas>
   <header class="wrap topbar">
-    <a class="brand" href="/" aria-label="Kuntechnology 项目导航首页">
-      <span class="brand-mark" aria-hidden="true">
-        <svg width="34" height="34" viewBox="0 0 34 34" fill="none"><path d="M17 2.5 30 10v14L17 31.5 4 24V10L17 2.5Z" stroke="currentColor" stroke-width="1.5"/><path d="m12 11 6 6-6 6m7-6h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </span>
+    <a class="brand" href="/" aria-label="Kuntechnology 数字现场首页">
+      <span class="brand-symbol" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2.5 21.5 8v8L12 21.5 2.5 16V8L12 2.5Z" stroke="currentColor" stroke-width="1.3"/><path d="m9 8 4 4-4 4m4-4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       <span class="brand-name">KUNTECHNOLOGY</span>
     </a>
-    <span class="top-note">PROJECT INDEX&nbsp; / &nbsp;项目导航</span>
+    <div class="top-meta"><span class="pulse">STATIC / 05 ROUTES</span><span class="top-index">DIGITAL FIELD NOTES&nbsp; · &nbsp;01</span></div>
   </header>
 
-  <main class="wrap">
+  <main id="main" class="wrap">
     <section class="hero" aria-labelledby="page-title">
-      <div>
-        <span class="eyebrow">精选项目 · 一页直达</span>
-        <h1 id="page-title">探索正在<br><span>发生的事。</span></h1>
-        <p class="hero-copy">从设计灵感与实用工具，到安全方案和技术可视化。把值得体验的项目收在这里，选择一个入口，即刻开始。</p>
+      <div class="hero-intro">
+        <div class="eyebrow">Digital portfolio <span aria-hidden="true">/</span> 项目星图</div>
+        <h1 id="page-title">让好奇心<br>进入<span class="gradient">数字现场。</span></h1>
+        <p class="hero-copy">这里收集着设计实验、轻量工具与技术可视化。沿着信号连接，找到下一段值得探索的内容。</p>
         <div class="hero-actions">
-          <a class="primary-link" href="#projects">浏览全部项目 <span aria-hidden="true">↓</span></a>
-          <span class="text-link">05 个公开项目入口</span>
+          <a class="button-main" href="#projects">扫描项目星图 <span aria-hidden="true">↓</span></a>
+          <a class="text-link" href="https://github.com/kuntechnology/kuntechnology.github.io" target="_blank" rel="noopener noreferrer">查看首页源码 ↗<span class="sr-only">（新标签页打开）</span></a>
+        </div>
+        <div class="hero-facts" aria-label="项目统计">
+          <div class="fact"><strong>05</strong><span>公开访问路径</span></div>
+          <div class="fact"><strong>04</strong><span>不同项目内容</span></div>
+          <div class="fact"><strong>00</strong><span>外部运行依赖</span></div>
         </div>
       </div>
-      <div class="hero-art" aria-hidden="true">
-        <span class="art-orbit"></span><span class="art-dot one"></span><span class="art-dot two"></span>
-        <span class="art-core"><svg width="47" height="47" viewBox="0 0 48 48" fill="none"><path d="M10 11v26M10 24l17-13M10 24l18 13M29 16h9M29 32h9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="38" cy="16" r="3" fill="currentColor"/><circle cx="38" cy="32" r="3" fill="currentColor"/></svg></span>
-        <span class="art-label">IDEAS IN MOTION</span>
+
+      <div class="map-panel" id="project-map" aria-label="项目关系星图">
+        <div class="map-head"><span>FIELD MAP&nbsp; / &nbsp;PROJECT ROUTES</span><span class="map-count">05 NODES</span></div>
+        <svg class="map-svg" viewBox="0 0 620 438" role="group" aria-label="可交互项目星图；选择节点可打开对应项目">
+          <ellipse class="orbit orbit-1" cx="310" cy="218" rx="246" ry="151"/>
+          <ellipse class="orbit orbit-2" cx="310" cy="218" rx="202" ry="114" transform="rotate(-27 310 218)"/>
+          <ellipse class="orbit orbit-3" cx="310" cy="218" rx="155" ry="68" transform="rotate(23 310 218)"/>
+          <path class="link-line" data-project="design" d="M310 218 139 112"/>
+          <path class="link-line" data-project="utility" d="M310 218 480 112"/>
+          <path class="link-line" data-project="defense" d="M310 218 135 323"/>
+          <path class="link-line" data-project="mirror" d="M310 218 310 354"/>
+          <path class="link-line" data-project="learning" d="M310 218 487 322"/>
+          <circle class="map-core-glow" cx="310" cy="218" r="42"/>
+          <circle class="map-core" cx="310" cy="218" r="28"/>
+          <text class="core-mark" x="310" y="217">K/01</text>
+          <text class="core-label" x="310" y="260">INDEX NODE</text>
+          <a class="node-link" data-project="design" style="--node:#a89cff" href="https://kuntechnology.github.io/ui-style-gallery/" target="_blank" rel="noopener noreferrer" aria-label="打开 UI 设计风格集锦，新标签页">
+            <title>打开 UI 设计风格集锦（新标签页）</title><circle class="node-dot" cx="139" cy="112" r="5" fill="#a89cff"/><rect class="node-box" x="39" y="67" width="137" height="37" rx="6"/><text class="node-title" x="51" y="83">UI 设计风格集锦</text><text class="node-type" x="51" y="96">DESIGN / 44 STYLES</text>
+          </a>
+          <a class="node-link" data-project="utility" style="--node:#ff77ba" href="https://kuntechnology.github.io/iv-infusion-helper/" target="_blank" rel="noopener noreferrer" aria-label="打开输液提醒小助手，新标签页">
+            <title>打开输液提醒小助手（新标签页）</title><circle class="node-dot" cx="480" cy="112" r="5" fill="#ff77ba"/><rect class="node-box" x="440" y="67" width="151" height="37" rx="6"/><text class="node-title" x="452" y="83">输液提醒小助手</text><text class="node-type" x="452" y="96">UTILITY / TIMER</text>
+          </a>
+          <a class="node-link" data-project="defense" style="--node:#6ce8ff" href="https://kuntechnology.github.io/Das-security/" target="_blank" rel="noopener noreferrer" aria-label="打开安恒信息安全服务方案，新标签页">
+            <title>打开安恒信息安全服务方案（新标签页）</title><circle class="node-dot" cx="135" cy="323" r="5" fill="#6ce8ff"/><rect class="node-box" x="36" y="333" width="170" height="37" rx="6"/><text class="node-title" x="48" y="349">安恒信息安全方案</text><text class="node-type" x="48" y="362">SECURITY / SERVICE</text>
+          </a>
+          <a class="node-link" data-project="mirror" style="--node:#ffb86b" href="https://kuntechnology.github.io/Kuntech/" target="_blank" rel="noopener noreferrer" aria-label="打开 Kuntech 安全方案镜像备用入口，内容与安恒信息安全方案相同，新标签页">
+            <title>Kuntech 安全方案镜像 / 备用入口，内容与安恒方案相同（新标签页）</title><circle class="node-dot" cx="310" cy="354" r="5" fill="#ffb86b"/><rect class="node-box" x="232" y="373" width="156" height="37" rx="6"/><text class="node-title" x="244" y="389">Kuntech · 镜像入口</text><text class="node-type" x="244" y="402">BACKUP / SAME CONTENT</text>
+          </a>
+          <a class="node-link" data-project="learning" style="--node:#cbff65" href="https://kuntechnology.github.io/sftp-visualization-guide/" target="_blank" rel="noopener noreferrer" aria-label="打开 SFTP 安全传输可视化指南，新标签页">
+            <title>打开 SFTP 安全传输可视化指南（新标签页）</title><circle class="node-dot" cx="487" cy="322" r="5" fill="#cbff65"/><rect class="node-box" x="414" y="333" width="177" height="37" rx="6"/><text class="node-title" x="426" y="349">SFTP 可视化指南</text><text class="node-type" x="426" y="362">LEARN / INTERACTIVE</text>
+          </a>
+        </svg>
       </div>
+      <div class="mobile-map-note"><span><strong>星图已折叠为清晰纵向目录</strong></span><span aria-hidden="true">↓ 05 ROUTES</span></div>
     </section>
 
-    <section id="projects" aria-labelledby="projects-heading">
-      <div class="section-head">
-        <div><p class="section-kicker">PROJECTS / 入口目录</p><h2 id="projects-heading">选择一个项目开始</h2></div>
-        <span class="count"><strong>05</strong> / 05</span>
+    <section id="projects" class="section" aria-labelledby="projects-heading">
+      <div class="section-top">
+        <div><p class="section-kicker">01 — 05&nbsp; / &nbsp;SELECT A SIGNAL</p><h2 id="projects-heading">选择一条路径</h2><p class="section-intro">每个节点通向一个公开项目。悬停或聚焦卡片，可在星图中追踪对应信号。</p></div>
+        <div class="section-count"><strong id="visible-count">05</strong> <span>/ 05 PATHS</span></div>
       </div>
-      <div class="grid">
-        <a class="card" href="https://kuntechnology.github.io/ui-style-gallery/" target="_blank" rel="noopener noreferrer" aria-label="打开 UI 设计风格集锦，新标签页">
-          <div class="card-top"><span class="card-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4" width="17" height="16" rx="3" stroke="currentColor" stroke-width="1.7"/><path d="M8 9h8M8 12.5h5M8 16h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="17" cy="12.5" r="1" fill="currentColor"/></svg></span><span class="card-num">01 — 05</span></div>
-          <span class="tag">设计资源 · 灵感库</span><h3>UI 设计风格集锦</h3>
-          <p>探索 44 种可复用的界面风格，查看设计 tokens、迷你示例与可复制的 AI 提示词。</p>
-          <span class="card-bottom"><span>打开风格库</span><span class="arrow" aria-hidden="true">↗</span></span>
+      <div class="toolbar" aria-label="项目筛选工具">
+        <div class="filters" role="group" aria-label="按类型筛选项目">
+          <button class="filter-btn" type="button" data-filter="all" aria-pressed="true">全部 <span>(5)</span></button>
+          <button class="filter-btn" type="button" data-filter="design" aria-pressed="false">设计 <span>(1)</span></button>
+          <button class="filter-btn" type="button" data-filter="tools" aria-pressed="false">工具 <span>(1)</span></button>
+          <button class="filter-btn" type="button" data-filter="security" aria-pressed="false">安全 / 指南 <span>(3)</span></button>
+        </div>
+        <label class="search-wrap"><span class="sr-only">搜索项目名称或说明</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="m12.5 12.5 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><input id="project-search" class="search" type="search" placeholder="搜索项目…" autocomplete="off"><span class="shortcut" aria-hidden="true">/</span></label>
+      </div>
+      <div id="project-grid" class="project-grid">
+        <a class="project-card" data-project="design" data-category="design" href="https://kuntechnology.github.io/ui-style-gallery/" target="_blank" rel="noopener noreferrer" style="--accent:#a89cff" aria-label="打开 UI 设计风格集锦，新标签页">
+          <div class="card-head"><span>NODE / 01</span><span class="card-signal">DESIGN SIGNAL</span></div><h3 class="card-title">UI 设计风格集锦</h3><p class="card-desc">浏览 44 种界面风格、设计 tokens 与迷你示例，把视觉灵感转化为可复用的设计语言。</p><div class="card-foot"><span>打开风格库 <span class="sr-only">（新标签页打开）</span></span><span class="launch" aria-hidden="true">↗</span></div>
         </a>
-
-        <a class="card" href="https://kuntechnology.github.io/iv-infusion-helper/" target="_blank" rel="noopener noreferrer" aria-label="打开输液提醒小助手，新标签页">
-          <div class="card-top"><span class="card-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 3h6M10 3v5l-4.5 8.1A3.3 3.3 0 0 0 8.4 21h7.2a3.3 3.3 0 0 0 2.9-4.9L14 8V3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 15h8M10 12h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><span class="card-num">02 — 05</span></div>
-          <span class="tag">轻量工具 · 提醒</span><h3>输液提醒小助手</h3>
-          <p>选择容量并记录实际滴速，估算输液时长与结束时间；支持添加日历提醒，结果仅供参考。</p>
-          <span class="card-bottom"><span>打开提醒助手</span><span class="arrow" aria-hidden="true">↗</span></span>
+        <a class="project-card" data-project="utility" data-category="tools" href="https://kuntechnology.github.io/iv-infusion-helper/" target="_blank" rel="noopener noreferrer" style="--accent:#ff77ba" aria-label="打开输液提醒小助手，新标签页">
+          <div class="card-head"><span>NODE / 02</span><span class="card-signal">UTILITY SIGNAL</span></div><h3 class="card-title">输液提醒小助手</h3><p class="card-desc">输入容量与实际滴速，估算时长和结束时间，并可添加日历提醒；计算结果仅供参考。</p><div class="card-foot"><span>打开提醒助手 <span class="sr-only">（新标签页打开）</span></span><span class="launch" aria-hidden="true">↗</span></div>
         </a>
-
-        <a class="card" href="https://kuntechnology.github.io/Das-security/" target="_blank" rel="noopener noreferrer" aria-label="打开安恒信息安全服务展示页面，新标签页">
-          <div class="card-top"><span class="card-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3 20 6v5.5c0 4.5-3.2 7.5-8 9.5-4.8-2-8-5-8-9.5V6l8-3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m8.5 12 2.3 2.3 4.8-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="card-num">03 — 05</span></div>
-          <span class="tag">企业安全 · 方案展示</span><h3>安恒信息安全服务方案</h3>
-          <p>金融行业渗透测试服务展示，介绍安全合规检测、自动化测试与相关服务案例。</p>
-          <span class="card-bottom"><span>查看安全方案</span><span class="arrow" aria-hidden="true">↗</span></span>
+        <a class="project-card" data-project="defense" data-category="security" href="https://kuntechnology.github.io/Das-security/" target="_blank" rel="noopener noreferrer" style="--accent:#6ce8ff" aria-label="打开安恒信息安全服务方案，新标签页">
+          <div class="card-head"><span>NODE / 03</span><span class="card-signal">SERVICE SIGNAL</span></div><h3 class="card-title">安恒信息安全服务方案</h3><p class="card-desc">金融行业安全服务展示，介绍合规检测、自动化测试与相关服务案例。</p><div class="card-foot"><span>查看安全方案 <span class="sr-only">（新标签页打开）</span></span><span class="launch" aria-hidden="true">↗</span></div>
         </a>
-
-        <a class="card" href="https://kuntechnology.github.io/Kuntech/" target="_blank" rel="noopener noreferrer" aria-label="打开 Kuntech 安全方案镜像页，新标签页">
-          <div class="card-top"><span class="card-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M8 8.5 4 12l4 3.5M16 8.5l4 3.5-4 3.5M14 5l-4 14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 4h4M16 20h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><span class="card-num">04 — 05</span></div>
-          <span class="tag">独立地址 · 镜像入口</span><h3>Kuntech 安全方案页</h3>
-          <p>保留 Kuntech 的独立访问地址，当前展示内容与安恒信息安全方案页相同。</p>
-          <span class="card-bottom"><span>打开 Kuntech 页面</span><span class="arrow" aria-hidden="true">↗</span></span>
+        <a class="project-card mirror-card" data-project="mirror" data-category="security" href="https://kuntechnology.github.io/Kuntech/" target="_blank" rel="noopener noreferrer" style="--accent:#ffb86b" aria-label="打开 Kuntech 安全方案镜像备用入口；内容与安恒信息安全服务方案相同，新标签页">
+          <div class="card-head"><span>NODE / 04</span><span class="mirror-mark"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 5 3 8l3 3m4-6 3 3-3 3M9.5 3.5l-3 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>MIRROR / BACKUP</span></div><h3 class="card-title">Kuntech 安全方案页</h3><p class="card-desc">镜像 / 备用访问地址；页面内容与 NODE 03 的安恒信息安全方案相同，并非独立方案。</p><div class="card-foot"><span>打开镜像备用入口 <span class="sr-only">（新标签页打开）</span></span><span class="launch" aria-hidden="true">↗</span></div>
         </a>
-
-        <a class="card" href="https://kuntechnology.github.io/sftp-visualization-guide/" target="_blank" rel="noopener noreferrer" aria-label="打开 SFTP 安全传输可视化指南，新标签页">
-          <div class="card-top"><span class="card-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4" width="17" height="16" rx="3" stroke="currentColor" stroke-width="1.7"/><path d="M7.5 9.5h3M13.5 9.5h3M9 14.5h6M12 9.5v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="7.5" cy="9.5" r=".8" fill="currentColor"/><circle cx="16.5" cy="9.5" r=".8" fill="currentColor"/></svg></span><span class="card-num">05 — 05</span></div>
-          <span class="tag">交互学习 · 网络安全</span><h3>SFTP 安全传输可视化指南</h3>
-          <p>用图示与交互动画理解 SFTP、SSH 加密隧道、协议解析限制及安全厂商识别方式。</p>
-          <span class="card-bottom"><span>开始交互学习</span><span class="arrow" aria-hidden="true">↗</span></span>
+        <a class="project-card" data-project="learning" data-category="security" href="https://kuntechnology.github.io/sftp-visualization-guide/" target="_blank" rel="noopener noreferrer" style="--accent:#cbff65" aria-label="打开 SFTP 安全传输可视化指南，新标签页">
+          <div class="card-head"><span>NODE / 05</span><span class="card-signal">LEARNING SIGNAL</span></div><h3 class="card-title">SFTP 安全传输可视化指南</h3><p class="card-desc">通过交互图示了解 SFTP、SSH 加密隧道与协议解析限制。</p><div class="card-foot"><span>开始交互学习 <span class="sr-only">（新标签页打开）</span></span><span class="launch" aria-hidden="true">↗</span></div>
         </a>
       </div>
-      <p class="footnote"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v4M10 6.2h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>每张卡片都会打开对应项目的原有公开站点。这里仅提供统一入口，不迁移或替换任何项目内容。</span></p>
+      <p id="results-note" class="results-note" role="status" aria-live="polite">显示全部 5 条项目路径。</p>
+      <p class="footnote"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.4"/><path d="M10 9v4M10 6.2h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>这是纯静态项目索引；链接分别指向各自的公开页面。本首页不承载后台服务，也不替代项目页面中的说明与限制。Kuntech 链接是安恒方案的镜像 / 备用入口，内容相同。</span></p>
     </section>
   </main>
 
-  <footer class="wrap"><span>© Kuntechnology · Project Index</span><a href="https://github.com/kuntechnology/kuntechnology.github.io" target="_blank" rel="noopener noreferrer">首页源码 ↗</a></footer>
+  <footer class="wrap"><span>© KUNTECHNOLOGY&nbsp; / &nbsp;DIGITAL FIELD NOTES</span><a href="https://github.com/kuntechnology/kuntechnology.github.io" target="_blank" rel="noopener noreferrer">SOURCE CODE ↗</a></footer>
+  <script>
+    (() => {
+      const cards = [...document.querySelectorAll('.project-card')];
+      const nodes = [...document.querySelectorAll('.node-link')];
+      const lines = [...document.querySelectorAll('.link-line')];
+      const map = document.getElementById('project-map');
+      const search = document.getElementById('project-search');
+      const counter = document.getElementById('visible-count');
+      const note = document.getElementById('results-note');
+      const filters = [...document.querySelectorAll('.filter-btn')];
+      let activeFilter = 'all';
+
+      function setActive(project) {
+        if (project) map.dataset.active = project; else delete map.dataset.active;
+        nodes.forEach(node => node.classList.toggle('is-active', !!project && node.dataset.project === project));
+        lines.forEach(line => line.classList.toggle('is-active', !!project && line.dataset.project === project));
+        cards.forEach(card => card.classList.toggle('is-active', !!project && card.dataset.project === project));
+      }
+      cards.forEach(card => {
+        card.addEventListener('pointerenter', () => setActive(card.dataset.project));
+        card.addEventListener('pointerleave', () => setActive(document.activeElement?.dataset?.project || ''));
+        card.addEventListener('focus', () => setActive(card.dataset.project));
+        card.addEventListener('blur', () => setActive(''));
+      });
+      nodes.forEach(node => {
+        node.addEventListener('pointerenter', () => setActive(node.dataset.project));
+        node.addEventListener('pointerleave', () => setActive(document.activeElement?.dataset?.project || ''));
+        node.addEventListener('focus', () => setActive(node.dataset.project));
+        node.addEventListener('blur', () => setActive(''));
+      });
+      function applyFilters() {
+        const query = search.value.trim().toLocaleLowerCase('zh-CN');
+        let shown = 0;
+        cards.forEach(card => {
+          const matchesType = activeFilter === 'all' || card.dataset.category === activeFilter;
+          const matchesText = !query || card.textContent.toLocaleLowerCase('zh-CN').includes(query);
+          const visible = matchesType && matchesText;
+          card.hidden = !visible;
+          if (visible) shown++;
+        });
+        counter.textContent = String(shown).padStart(2, '0');
+        note.textContent = shown ? `找到 ${shown} 条项目路径。` : '没有匹配的项目；试试更短的关键词或切换分类。';
+      }
+      filters.forEach(button => button.addEventListener('click', () => {
+        activeFilter = button.dataset.filter;
+        filters.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+        applyFilters();
+      }));
+      search.addEventListener('input', applyFilters);
+      document.addEventListener('keydown', event => {
+        if (event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && !['INPUT','TEXTAREA'].includes(document.activeElement?.tagName) && !document.activeElement?.isContentEditable) {
+          event.preventDefault(); search.focus();
+        }
+        if (event.key === 'Escape' && document.activeElement === search) {
+          search.value = ''; applyFilters(); search.blur();
+        }
+      });
+
+      const canvas = document.getElementById('field');
+      const ctx = canvas.getContext('2d', { alpha: true });
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let width = 0, height = 0, dpr = 1, points = [], frame = 0, lastPaint = 0, active = false;
+      let seed = 971;
+      const random = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+      function resize() {
+        width = window.innerWidth; height = window.innerHeight;
+        dpr = Math.min(window.devicePixelRatio || 1, width < 700 ? 1.15 : 1.5);
+        canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
+        canvas.style.width = `${width}px`; canvas.style.height = `${height}px`;
+        const amount = Math.max(18, Math.min(width < 700 ? 27 : 48, Math.floor(width * height / 24000)));
+        seed = 971; points = Array.from({length: amount}, () => ({x: random()*width, y: random()*height, vx: (random()-.5)*.16, vy: (random()-.5)*.16, r: .6+random()*1.15}));
+        paint(0, false);
+      }
+      function paint(time, move) {
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, width, height);
+        for (let i=0; i<points.length; i++) {
+          const p = points[i];
+          if (move) { p.x += p.vx; p.y += p.vy; if (p.x < -8 || p.x > width+8) p.vx *= -1; if (p.y < -8 || p.y > height+8) p.vy *= -1; }
+          for (let j=i+1; j<points.length; j++) {
+            const q=points[j], dx=p.x-q.x, dy=p.y-q.y, distance=Math.hypot(dx,dy);
+            if (distance < 112) { ctx.strokeStyle=`rgba(108,232,255,${(1-distance/112)*.11})`; ctx.lineWidth=.7; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); }
+          }
+          ctx.fillStyle='rgba(170,220,255,.48)'; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+        }
+      }
+      function tick(time) {
+        if (!active || document.hidden || reduceMotion.matches) { frame=0; return; }
+        if (time-lastPaint >= 34) { paint(time,true); lastPaint=time; }
+        frame=requestAnimationFrame(tick);
+      }
+      function start() { active=true; if (!reduceMotion.matches && !document.hidden && !frame) frame=requestAnimationFrame(tick); }
+      function stop() { active=false; if (frame) cancelAnimationFrame(frame); frame=0; }
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) { if (frame) cancelAnimationFrame(frame); frame=0; }
+        else if (active && !reduceMotion.matches && !frame) frame=requestAnimationFrame(tick);
+      });
+      reduceMotion.addEventListener?.('change', () => { if (reduceMotion.matches) { if (frame) cancelAnimationFrame(frame); frame=0; paint(0,false); } else if (active && !document.hidden && !frame) frame=requestAnimationFrame(tick); });
+      window.addEventListener('resize', resize, {passive:true});
+      resize(); start();
+    })();
+  </script>
 </body>
 </html>
