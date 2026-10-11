@@ -34,7 +34,7 @@
       p=vec3(p.x,cos(tilt)*p.y-sin(tilt)*p.z,sin(tilt)*p.y+cos(tilt)*p.z);
       v_normal=normalize(p);
       v_uv=a_uv;
-      gl_Position=vec4(p.x*.68/u_aspect,p.y*.68,-p.z*.22,1.0);
+      gl_Position=vec4(p.x*.92/u_aspect,p.y*.92,-p.z*.22,1.0);
     }
   `;
   const earthFragmentSource = `
@@ -168,7 +168,7 @@
   }
   function resizeGL(){
     if(!gl||!stage||!earthCanvas) return;
-    const box=stage.getBoundingClientRect();
+    const box=earthCanvas.getBoundingClientRect();
     if(!box.width||!box.height) return;
     const pixelLimit=motion.matches?480000:840000;
     const scale=Math.min(window.devicePixelRatio||1,1.25,Math.sqrt(pixelLimit/(box.width*box.height)));
@@ -222,7 +222,7 @@
       };
       image.onerror=()=>{fx.texture='fallback';fail('texture-load-failed');};
       image.src='/assets/earth-blue-marble.webp';
-      if('ResizeObserver'in window){const observer=new ResizeObserver(resizeGL);observer.observe(stage);}
+      if('ResizeObserver'in window){const observer=new ResizeObserver(resizeGL);observer.observe(earthCanvas);}
       resizeGL();
     }catch(error){gl=null;earthProgram=null;airProgram=null;fail(error.message||'webgl-init-failed');}
   }

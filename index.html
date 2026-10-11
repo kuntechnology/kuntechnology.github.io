@@ -94,9 +94,9 @@
     .artwork-stage {
       grid-column: 2; grid-row: 1; position: relative; justify-self: center; width: min(100%, 790px, 76svh);
       aspect-ratio: 1; isolation: isolate; overflow: hidden;
-      background: radial-gradient(ellipse at 50% 50%, rgba(18, 73, 130, .20), rgba(7, 22, 42, .08) 43%, transparent 72%);
+      background: transparent;
     }
-    .artwork-stage::before { content: ""; position: absolute; z-index: 0; inset: 0; border-radius: 50%; background: radial-gradient(circle, rgba(109, 174, 203, .22) 0, rgba(90, 151, 182, .16) 43%, rgba(74, 130, 161, .09) 62%, transparent 86%); filter: blur(42px); pointer-events: none; }
+    .artwork-stage::before { content: ""; position: absolute; z-index: 0; inset: 8%; border-radius: 50%; background: radial-gradient(circle farthest-side, transparent 80%, rgba(109, 174, 203, .10) 84%, rgba(109, 174, 203, .16) 91%, rgba(74, 130, 161, .07) 97%, transparent 100%); filter: blur(10px); pointer-events: none; }
     .orbit-lines, .earth-scene, .globe-fallback { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
     .orbit-lines { z-index: 1; overflow: visible; fill: none; stroke: rgba(98, 181, 231, .31); stroke-width: 1; transform: translate3d(calc(var(--camera-x, 0px) * -.28), calc(var(--camera-y, 0px) * -.28), 0); }
     .orbit-lines .orbit-soft { stroke: rgba(91, 157, 209, .17); stroke-width: .8; }
@@ -106,7 +106,7 @@
     .globe-fallback { z-index: 2; inset: 16%; width: 68%; height: 68%; border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 36% 31%, #3779a7, #0c3357 49%, #061527 78%); box-shadow: inset -26px -10px 56px rgba(0, 0, 0, .66); transform: translate3d(calc(var(--camera-x, 0px) * .42), calc(var(--camera-y, 0px) * .42), 0); transition: opacity .7s ease, visibility .7s ease; }
     .globe-fallback img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; filter: saturate(1.14) hue-rotate(4deg) brightness(.82); }
     .globe-fallback::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 32% 29%, rgba(90, 189, 255, .06), transparent 38%), linear-gradient(113deg, rgba(10, 61, 106, .02) 38%, rgba(1, 8, 20, .60) 100%); box-shadow: inset -14px -4px 42px rgba(2, 9, 20, .48), inset 0 0 20px rgba(101, 186, 239, .04); }
-    .earth-scene { z-index: 3; opacity: 0; transform: translate3d(calc(var(--camera-x, 0px) * .42), calc(var(--camera-y, 0px) * .42), 0); transition: opacity .8s ease; }
+    .earth-scene { z-index: 3; inset: 13%; width: 74%; height: 74%; opacity: 0; transform: translate3d(calc(var(--camera-x, 0px) * .42), calc(var(--camera-y, 0px) * .42), 0); transition: opacity .8s ease; }
     .artwork-stage[data-webgl="ready"] .earth-scene { opacity: 1; }
     .artwork-stage[data-webgl="ready"] .globe-fallback { opacity: 0; visibility: hidden; }
     .stage-label, .stage-footnote { position: absolute; z-index: 4; color: #a7c6e4; font: 8px/1.5 var(--mono); letter-spacing: .16em; text-transform: uppercase; pointer-events: none; }
