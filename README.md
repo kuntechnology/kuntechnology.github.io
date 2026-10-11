@@ -13,7 +13,7 @@
 
 ## 首页视觉与性能
 
-首页以经纬度 UV 球面几何和本地 NASA Blue Marble 贴图构成旋转地球；WebGL 在球面上叠加低强度蓝色经纬线、缓慢扫描光与自发光大气边缘。SVG 轨道节点、Canvas 星尘和 GSAP 入场只作克制的艺术化场景辅助。球体是视觉表达，不是精确地理定位或科学测量；装饰网格与轨道不代表真实轨迹，也不暗示 NASA 背书。
+首页以经纬度 UV 球面几何和本地 NASA Blue Marble 贴图构成旋转地球；WebGL 在球面上叠加低强度蓝色经纬线、缓慢扫描光与自发光大气边缘。Canvas 按深度生成远暗近亮、近大远小的星点，桌面鼠标带来轻微视差与局部柔光；随机低频的小彗星只短暂掠过。左侧项目入口以低饱和透明灯带响应鼠标与键盘焦点。SVG 轨道节点和 GSAP 入场仍只作克制的艺术化场景辅助。球体是视觉表达，不是精确地理定位或科学测量；装饰网格与轨道不代表真实轨迹，也不暗示 NASA 背书。
 
 贴图来源为 NASA Earth Observatory 的 Blue Marble: Next Generation April 2004 global base map：
 
@@ -22,7 +22,7 @@
 - 首页署名：NASA Earth Observatory。
 - 本地副本 `assets/earth-blue-marble.webp`：2048 × 1024 WebP，约 152 KB；由官方 5400 × 2700 全球影像缩放与压缩。原始数据来源归属 NASA Earth Observatory，NASA 未参与或背书本项目。
 
-WebGL、贴图或着色器不可用时，首页显示同源 CSS / 图片静态地球；星空背景也有纯 CSS 渐变底色。WebGL backing buffer 有像素上限、目标帧率为 30 fps；Canvas 星点数量有限。地球场景离开视口或标签页进入后台时暂停；`prefers-reduced-motion` 下保留静态模型并关闭持续动效。项目链接使用原生语义化锚点、清晰键盘焦点环和跳过链接。布局从 320 CSS px 起适配。
+WebGL、贴图或着色器不可用时，首页显示同源 CSS / 图片静态地球；2D Canvas 不可用时保留纯 CSS 星点底图。WebGL backing buffer 与全屏 Canvas 均限制像素比和像素量，活动动效目标帧率不高于 30 fps；程序化星点上限为 180 个。地球场景与全屏星空分别在离开视口或标签页进入后台时暂停；`prefers-reduced-motion` 下显示静态星场与地球并关闭持续动效及指针视差。触摸设备不监听鼠标视差。项目链接使用原生语义化锚点、清晰键盘焦点环和跳过链接。布局从 320 CSS px 起适配。
 
 ## 第三方脚本许可
 

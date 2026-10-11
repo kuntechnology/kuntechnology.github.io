@@ -8,12 +8,15 @@
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const fx = window.__kuntechFx = {
     webgl: 'fallback', texture: 'pending', canvas: 'fallback', gsap: 'static',
-    reducedMotion: motion.matches, paused: true, frames: 0, fallbackReason: ''
+    reducedMotion: motion.matches, paused: true, frames: 0, fallbackReason: '',
+    starCount: 0, ambientFrames: 0, ambientDpr: 1, cometsSpawned: 0, cometActiveCount: 0, pointerActive: false
   };
   const gsap = window.gsap || null;
   let gl = null, earthProgram = null, airProgram = null, vertexBuffer = null, indexBuffer = null, texture = null;
   let indexCount = 0, width = 0, height = 0, raf = 0, ambientRaf = 0, lastFrame = 0;
-  let visible = true, ambientVisible = true, ambientCtx = null, dust = [], entrance = null;
+  let visible = true, ambientVisible = true, ambientCtx = null, dust = [], comets = [], entrance = null;
+  let pointerTarget = {x:0,y:0}, pointer = {x:0,y:0}, pointerMedia = window.matchMedia('(hover: hover) and (pointer: fine)');
+  let pointerEnabled = pointerMedia.matches && !motion.matches, ambientLastFrame = 0, nextCometAt = 0;
 
   const vertexSource = `
     attribute vec3 a_position;
@@ -229,62 +232,163 @@
     ambientCtx=ambientCanvas.getContext('2d',{alpha:true});
     if(!ambientCtx){fx.canvas='fallback';return;}
     fx.canvas='ready';
-    let seed=73119;
-    const random=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
-    const count=Math.min(46,Math.max(22,Math.round(window.innerWidth/30)));
-    dust=Array.from({length:count},()=>({x:random(),y:random(),r:.32+random()*.78,phase:random()*6.28,speed:.000025+random()*.000055}));
+    ambientCanvas.style.backgroundImage='none';
+    function createStarfield(){
+      let seed=73119;
+      const random=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
+      const count=Math.min(180,Math.max(72,Math.round(innerWidth*innerHeight/6800)));
+      dust=Array.from({length:count},()=>{
+        const depth=.08+Math.pow(random(),.78)*.92;
+        return {x:random(),y:random(),depth,r:.23+Math.pow(depth,1.75)*1.45,alpha:.12+depth*.39,phase:random()*6.28,speed:.3+depth*1.6};
+      });
+      fx.starCount=dust.length;
+    }
     function size(){
-      const scale=Math.min(window.devicePixelRatio||1,1);
+      const area=Math.max(1,innerWidth*innerHeight);
+      const scale=Math.min(window.devicePixelRatio||1,1.1,Math.sqrt(1100000/area));
       ambientCanvas.width=Math.max(1,Math.round(innerWidth*scale));
       ambientCanvas.height=Math.max(1,Math.round(innerHeight*scale));
       ambientCtx.setTransform(scale,0,0,scale,0,0);
+      fx.ambientDpr=scale;
+      createStarfield();
+      drawAmbient(0);
+    }
+    function updateCamera(){
+      if(!pointerEnabled||motion.matches){pointer.x=0;pointer.y=0;}
+      else{
+        pointer.x+=(pointerTarget.x-pointer.x)*.075;
+        pointer.y+=(pointerTarget.y-pointer.y)*.075;
+      }
+      if(stage){
+        stage.style.setProperty('--camera-x',`${(pointer.x*8).toFixed(2)}px`);
+        stage.style.setProperty('--camera-y',`${(pointer.y*6).toFixed(2)}px`);
+      }
+      fx.pointerActive=pointerEnabled&&!motion.matches;
+    }
+    function drawComets(now,ctx,w,h){
+      if(now>=nextCometAt){
+        if(Math.random()<.62){
+          const depth=.18+Math.random()*.78, angle=(.14+Math.random()*.42)*(Math.random()<.5?-1:1);
+          const speed=190+depth*260;
+          comets.push({x:Math.random()*w,y:Math.random()*h*.82,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,depth,length:15+depth*39,life:650+Math.random()*850,start:now});
+          fx.cometsSpawned++;
+        }
+        nextCometAt=now+14000+Math.random()*26000;
+      }
+      comets=comets.filter(comet=>{
+        const elapsed=now-comet.start, progress=elapsed/comet.life;
+        if(progress>=1) return false;
+        const x=comet.x+comet.vx*elapsed/1000, y=comet.y+comet.vy*elapsed/1000;
+        const norm=Math.hypot(comet.vx,comet.vy)||1, tailX=x-comet.vx/norm*comet.length, tailY=y-comet.vy/norm*comet.length;
+        const fade=Math.min(1,progress*5,(1-progress)*4), alpha=(.15+comet.depth*.22)*fade;
+        const trail=ctx.createLinearGradient(x,y,tailX,tailY);
+        trail.addColorStop(0,`rgba(186,229,255,${alpha})`); trail.addColorStop(1,'rgba(104,174,226,0)');
+        ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(tailX,tailY);
+        ctx.strokeStyle=trail; ctx.lineWidth=.45+comet.depth*.65; ctx.stroke();
+        ctx.beginPath(); ctx.arc(x,y,.55+comet.depth*.55,0,Math.PI*2);
+        ctx.fillStyle=`rgba(211,240,255,${alpha*.82})`; ctx.fill();
+        return true;
+      });
+      fx.cometActiveCount=comets.length;
+    }
+    function drawAmbient(now){
+      if(!ambientCtx) return;
+      const ctx=ambientCtx,w=innerWidth,h=innerHeight,reduced=motion.matches;
+      updateCamera();
+      ctx.clearRect(0,0,w,h);
+      if(pointerEnabled&&!reduced){
+        const cx=w*(.5+pointer.x*.5),cy=h*(.5+pointer.y*.5),glow=ctx.createRadialGradient(cx,cy,0,cx,cy,300);
+        glow.addColorStop(0,'rgba(111,183,224,.035)'); glow.addColorStop(1,'rgba(111,183,224,0)');
+        ctx.fillStyle=glow; ctx.fillRect(0,0,w,h);
+      }
+      for(const point of dust){
+        const drift=reduced?0:now*.001*point.speed;
+        const x=((point.x*w+pointer.x*point.depth*12)%w+w)%w;
+        const y=((point.y*h+drift)%h+h)%h;
+        const shimmer=reduced?.82:.76+.24*Math.sin(now*.0012+point.phase);
+        ctx.beginPath(); ctx.arc(x,y,point.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(151,207,244,${point.alpha*shimmer})`; ctx.fill();
+      }
+      if(!reduced) drawComets(now,ctx,w,h); else {comets=[];fx.cometActiveCount=0;}
+      fx.ambientFrames++;
     }
     function paint(now){
-      if(!ambientVisible||document.hidden||motion.matches){ambientRaf=0;return;}
-      const ctx=ambientCtx; ctx.clearRect(0,0,innerWidth,innerHeight);
-      for(const point of dust){
-        const y=(point.y+now*point.speed)%1;
-        const shimmer=.30+.70*(.5+.5*Math.sin(now*.00019+point.phase));
-        ctx.beginPath(); ctx.arc(point.x*innerWidth,y*innerHeight,point.r,0,Math.PI*2);
-        ctx.fillStyle=`rgba(119,194,242,${.17*shimmer})`; ctx.fill();
-      }
+      ambientRaf=0;
+      if(!ambientVisible||document.hidden||motion.matches) return;
+      if(now-ambientLastFrame<1000/30){ambientRaf=requestAnimationFrame(paint);return;}
+      ambientLastFrame=now;
+      drawAmbient(now);
       ambientRaf=requestAnimationFrame(paint);
     }
     function start(){
       if(motion.matches||document.hidden||!ambientVisible||ambientRaf) return;
+      if(!nextCometAt||nextCometAt<performance.now()) nextCometAt=performance.now()+14000+Math.random()*26000;
       ambientRaf=requestAnimationFrame(paint);
     }
+    nextCometAt=performance.now()+14000+Math.random()*26000;
     size();
     window.addEventListener('resize',size,{passive:true});
+    window.addEventListener('pointermove',event=>{
+      if(!pointerEnabled||event.pointerType!=='mouse') return;
+      pointerTarget.x=(event.clientX/Math.max(1,innerWidth)-.5)*2;
+      pointerTarget.y=(event.clientY/Math.max(1,innerHeight)-.5)*2;
+    },{passive:true});
+    window.addEventListener('blur',()=>{pointerTarget={x:0,y:0};},{passive:true});
+    document.querySelectorAll('.index-link').forEach(link=>{
+      link.addEventListener('pointermove',event=>{
+        if(!pointerEnabled||event.pointerType!=='mouse') return;
+        const rect=link.getBoundingClientRect();
+        link.style.setProperty('--link-glow-x',`${event.clientX-rect.left}px`);
+        link.style.setProperty('--link-glow-y',`${event.clientY-rect.top}px`);
+      },{passive:true});
+      link.addEventListener('pointerleave',()=>{
+        link.style.setProperty('--link-glow-x','50%');
+        link.style.setProperty('--link-glow-y','50%');
+      },{passive:true});
+    });
+    const pointerChange=event=>{pointerEnabled=event.matches&&!motion.matches;if(!pointerEnabled) pointerTarget={x:0,y:0};};
+    if(pointerMedia.addEventListener) pointerMedia.addEventListener('change',pointerChange); else pointerMedia.addListener?.(pointerChange);
     window.__kuntechAmbientStart=start;
+    window.__kuntechAmbientStatic=()=>drawAmbient(0);
     start();
   }
   function stopAmbient(){if(ambientRaf) cancelAnimationFrame(ambientRaf); ambientRaf=0;}
   function syncActivity(){
-    const active=!document.hidden&&visible;
-    fx.paused=!active||motion.matches;
-    if(stage) stage.dataset.paused=String(!active||motion.matches);
-    if(!active){stopGL();stopAmbient();if(entrance) entrance.pause();return;}
-    if(motion.matches){stopGL();stopAmbient();draw(0);return;}
-    startGL();
-    if(window.__kuntechAmbientStart) window.__kuntechAmbientStart();
-    if(entrance) entrance.play();
+    const sceneActive=!document.hidden&&visible, ambientActive=!document.hidden&&ambientVisible;
+    fx.paused=!sceneActive||motion.matches;
+    if(stage) stage.dataset.paused=String(!sceneActive||motion.matches);
+    if(!sceneActive){stopGL();if(entrance) entrance.pause();}
+    else if(motion.matches){stopGL();draw(0);}
+    else{startGL();if(entrance) entrance.play();}
+    if(!ambientActive||motion.matches){stopAmbient();if(motion.matches&&window.__kuntechAmbientStatic) window.__kuntechAmbientStatic();}
+    else if(window.__kuntechAmbientStart) window.__kuntechAmbientStart();
   }
   function motionChange(event){
     fx.reducedMotion=typeof event?.matches==='boolean'?event.matches:motion.matches;
     fx.gsap=fx.reducedMotion?'reduced':(gsap?'ready':'unavailable');
+    pointerEnabled=pointerMedia.matches&&!motion.matches;
+    if(!pointerEnabled) pointerTarget={x:0,y:0};
     resizeGL(); syncActivity();
   }
   if(motion.addEventListener) motion.addEventListener('change',motionChange); else motion.addListener?.(motionChange);
   document.addEventListener('visibilitychange',syncActivity);
   window.addEventListener('pagehide',()=>{stopGL();stopAmbient();if(entrance) entrance.pause();});
-  if('IntersectionObserver'in window&&stage){
-    const observer=new IntersectionObserver(entries=>{
-      visible=Boolean(entries[0]?.isIntersecting);
-      ambientVisible=visible;
-      syncActivity();
-    },{threshold:.01});
-    observer.observe(stage);
+  window.addEventListener('pageshow',syncActivity);
+  if('IntersectionObserver'in window){
+    if(stage){
+      const sceneObserver=new IntersectionObserver(entries=>{
+        visible=Boolean(entries[0]?.isIntersecting);
+        syncActivity();
+      },{threshold:.01});
+      sceneObserver.observe(stage);
+    }
+    if(ambientCanvas){
+      const ambientObserver=new IntersectionObserver(entries=>{
+        ambientVisible=Boolean(entries[0]?.isIntersecting);
+        syncActivity();
+      },{threshold:.01});
+      ambientObserver.observe(ambientCanvas);
+    }
   }
 
   initAmbient();
