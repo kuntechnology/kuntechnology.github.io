@@ -75,8 +75,8 @@
     void main(){
       vec3 n=normalize(v_normal);
       float rim=pow(1.0-abs(n.z),2.55);
-      float alpha=.006+rim*.04;
-      gl_FragColor=vec4(.25,.45,.60,alpha);
+      float alpha=.001+rim*.006;
+      gl_FragColor=vec4(.28,.38,.46,alpha);
     }
   `;
 
