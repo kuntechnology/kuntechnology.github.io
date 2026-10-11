@@ -1,6 +1,6 @@
-# Kuntechnology 项目导航
+# Kuntechnology 根站首页
 
-这是 `https://kuntechnology.github.io/` 的纯静态首页，为四个内容不同的公开 GitHub Pages 项目提供统一入口。页面用原生 HTML、CSS、SVG、WebGL 与 Canvas；GSAP 以固定版本本地发布，无外部 CDN 请求、字体或私有项目数据。
+这是 `https://kuntechnology.github.io/` 的纯静态首页，为四个内容不同的公开 GitHub Pages 项目提供统一入口。页面用原生 HTML、CSS、SVG、WebGL 与 Canvas；GSAP 以固定版本本地发布，无外部 CDN、字体或私有项目数据。
 
 ## 项目入口
 
@@ -11,14 +11,21 @@
 | 安恒信息安全服务方案 | 金融行业安全服务展示 | https://kuntechnology.github.io/Das-security/ |
 | SFTP 安全传输可视化指南 | 交互式 SFTP / SSH 加密学习页面 | https://kuntechnology.github.io/sftp-visualization-guide/ |
 
-## 首页体验与发布
+## 首页视觉与性能
 
-首页以原生 WebGL fragment shader 绘制动态能量球与扫描网格，Canvas 2D 绘制粒子与信号线，GSAP 3.15.0 编排标题、星图、筛选、hover 与滚动揭示；页面仍无构建步骤。GSAP 由仓库本地托管，不请求运行时 CDN。WebGL 不可用或上下文丢失时回退到 CSS 静态星场；移动端折叠星图，保留纵向项目目录。
+首页以经纬度 UV 球面几何和本地 NASA Blue Marble 贴图构成旋转地球；WebGL 在球面上叠加低强度蓝色经纬线、缓慢扫描光与自发光大气边缘。SVG 轨道节点、Canvas 星尘和 GSAP 入场只作克制的艺术化场景辅助。球体是视觉表达，不是精确地理定位或科学测量；装饰网格与轨道不代表真实轨迹，也不暗示 NASA 背书。
 
-动画尊重 `prefers-reduced-motion`：只绘制静帧并停用 GSAP 动效。文档页进入后台时暂停 Canvas、WebGL 与 GSAP；星图离开视口时暂停 WebGL。Canvas DPR 有上限、粒子数量受限，WebGL backing buffer 与帧率也有上限。项目入口仍是语义化链接，筛选、搜索、键盘焦点环和 `/` 搜索快捷键均保留。
+贴图来源为 NASA Earth Observatory 的 Blue Marble: Next Generation April 2004 global base map：
+
+- 原始文件：https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-base/april/world.200404.3x5400x2700.jpg
+- 官方项目与转载署名说明：https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/
+- 首页署名：NASA Earth Observatory。
+- 本地副本 `assets/earth-blue-marble.webp`：2048 × 1024 WebP，约 152 KB；由官方 5400 × 2700 全球影像缩放与压缩。原始数据来源归属 NASA Earth Observatory，NASA 未参与或背书本项目。
+
+WebGL、贴图或着色器不可用时，首页显示同源 CSS / 图片静态地球；星空背景也有纯 CSS 渐变底色。WebGL backing buffer 有像素上限、目标帧率为 30 fps；Canvas 星点数量有限。地球场景离开视口或标签页进入后台时暂停；`prefers-reduced-motion` 下保留静态模型并关闭持续动效。项目链接使用原生语义化锚点、清晰键盘焦点环和跳过链接。布局从 320 CSS px 起适配。
 
 ## 第三方脚本许可
 
 `assets/gsap-3.15.0.min.js` 来自 npm 官方 `gsap@3.15.0` 包。GSAP 采用 Standard “No Charge” license，允许网站使用；完整条款与限制见 [GSAP Standard License](https://gsap.com/community/standard-license/)。随仓库的 `assets/GSAP-LICENSE-NOTICE.txt` 记录版本与许可链接。
 
-GitHub Pages 从 `main` 分支根目录发布；提交后首页地址为 `https://kuntechnology.github.io/`。本仓库仅管理根站项目导航，不复制或迁移其他项目内容。
+GitHub Pages 从 `main` 分支根目录发布；提交后首页地址为 `https://kuntechnology.github.io/`。本仓库只管理根站，不复制、修改或发布四个项目子站内容。

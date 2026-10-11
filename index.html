@@ -3,24 +3,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b0a0f">
-  <meta name="description" content="光在生长。Kuntechnology 的数字艺术作品与四个交互项目。">
+  <meta name="theme-color" content="#050b17">
+  <meta name="description" content="光在生长。以蓝色地球为中心的数字艺术首页，收录 Kuntechnology 的四个交互作品。">
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://kuntechnology.github.io/">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta property="og:type" content="website">
   <meta property="og:title" content="光在生长。 · Kuntechnology">
-  <meta property="og:description" content="一件生成中的数字雕塑，四个作品入口。">
+  <meta property="og:description" content="一颗蓝色星球，四段数字实践。">
   <meta property="og:url" content="https://kuntechnology.github.io/">
   <title>光在生长。 · Kuntechnology</title>
   <style>
     :root {
       color-scheme: dark;
-      --ink: #eee8e1;
-      --muted: #a69b98;
-      --dim: #746c70;
-      --ground: #0b0a0f;
-      --line: rgba(227, 213, 204, .17);
+      --ink: #e8f2fc;
+      --muted: #93a9c1;
+      --dim: #647c97;
+      --ground: #050b17;
+      --line: rgba(151, 190, 226, .18);
+      --blue: #78d8ff;
+      --blue-bright: #a0e9ff;
       --serif: "Songti SC", "Noto Serif CJK SC", STSong, "Yu Mincho", ui-serif, Georgia, serif;
       --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -29,95 +31,110 @@
     html { min-width: 320px; background: var(--ground); scroll-behavior: smooth; }
     body {
       min-width: 320px; min-height: 100svh; margin: 0; overflow-x: hidden; color: var(--ink);
-      background: radial-gradient(ellipse at 72% 47%, rgba(77, 32, 52, .13), transparent 37rem),
-        radial-gradient(ellipse at 44% 105%, rgba(86, 49, 34, .10), transparent 39rem), var(--ground);
+      background: radial-gradient(ellipse at 76% 45%, rgba(17, 77, 142, .19), transparent 38rem),
+        radial-gradient(ellipse at 18% 105%, rgba(19, 61, 104, .13), transparent 34rem), var(--ground);
       font-family: var(--sans); -webkit-font-smoothing: antialiased;
     }
     a { color: inherit; }
-    a:focus-visible { outline: 2px solid #f2b79f; outline-offset: 5px; border-radius: 2px; }
-    .skip-link { position: fixed; z-index: 10; top: 12px; left: 12px; padding: 11px 15px; transform: translateY(-160%); color: #171013; background: #f0c6b0; font-weight: 700; text-decoration: none; }
+    a:focus-visible { outline: 2px solid var(--blue-bright); outline-offset: 5px; border-radius: 2px; }
+    .skip-link { position: fixed; z-index: 10; top: 12px; left: 12px; padding: 11px 15px; transform: translateY(-160%); color: #07101e; background: var(--blue-bright); font-weight: 700; text-decoration: none; }
     .skip-link:focus { transform: translateY(0); }
-    .ambient { position: fixed; z-index: 0; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: .28; }
-    .frame { position: relative; z-index: 1; width: min(1500px, calc(100% - 88px)); margin-inline: auto; }
-    .masthead { height: 96px; display: flex; align-items: center; }
-    .wordmark { display: inline-flex; align-items: center; gap: 12px; color: #d5cbc4; text-decoration: none; }
-    .wordmark-mark { font: 500 21px/1 var(--serif); letter-spacing: -.08em; color: #e8b8a6; }
+    .ambient { position: fixed; z-index: 0; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: .62; }
+    .frame { position: relative; z-index: 1; width: min(1420px, calc(100% - 88px)); margin-inline: auto; }
+    .masthead { height: 88px; display: flex; align-items: center; }
+    .wordmark { display: inline-flex; align-items: center; gap: 12px; color: #cfdeee; text-decoration: none; }
+    .wordmark-mark { font: 500 21px/1 var(--serif); letter-spacing: -.08em; color: var(--blue); }
     .wordmark-name { font: 500 10px/1 var(--mono); letter-spacing: .2em; }
-    main { min-height: calc(100svh - 96px); }
+    main { min-height: calc(100svh - 88px); }
     .exhibition {
-      min-height: min(820px, calc(100svh - 96px));
-      display: grid; grid-template-columns: minmax(255px, .72fr) minmax(0, 1.45fr);
-      align-items: center; gap: clamp(32px, 5vw, 84px); padding: 14px 0 48px;
+      min-height: min(850px, calc(100svh - 88px));
+      display: grid; grid-template-columns: minmax(250px, .72fr) minmax(0, 1.28fr);
+      align-items: center; gap: clamp(32px, 5vw, 86px); padding: 8px 0 34px;
     }
-    .copy { grid-column: 1; grid-row: 1; position: relative; z-index: 3; padding: 28px 0 34px; }
-    h1 {
-      margin: 0; max-width: 440px; color: #f0e9e2; font: 500 clamp(45px, 5.1vw, 76px)/1.18 var(--serif);
-      letter-spacing: .025em; text-wrap: balance;
-    }
-    .index { margin: clamp(52px, 10vh, 112px) 0 0; padding: 0; list-style: none; }
+    .copy { grid-column: 1; grid-row: 1; position: relative; z-index: 3; padding: 26px 0 28px; }
+    .eyebrow { display: flex; align-items: center; gap: 11px; margin: 0 0 26px; color: #8fb4d7; font: 9px/1.4 var(--mono); letter-spacing: .19em; text-transform: uppercase; }
+    .eyebrow::before { content: ""; width: 23px; height: 1px; background: #62c8f4; box-shadow: 0 0 12px rgba(78, 195, 250, .7); }
+    h1 { margin: 0; max-width: 450px; color: #eaf4ff; font: 500 clamp(45px, 5.2vw, 76px)/1.22 var(--serif); letter-spacing: .025em; text-wrap: balance; }
+    .intro { margin: 21px 0 0; color: var(--muted); font-size: 13px; line-height: 1.8; letter-spacing: .035em; }
+    .index { margin: clamp(48px, 9vh, 102px) 0 0; padding: 0; list-style: none; }
     .index li { border-top: 1px solid var(--line); }
     .index li:last-child { border-bottom: 1px solid var(--line); }
     .index-link {
-      min-height: 58px; display: grid; grid-template-columns: 32px 1fr 20px; align-items: center; gap: 11px;
+      min-height: 58px; display: grid; grid-template-columns: 32px minmax(0, 1fr) 20px; align-items: center; gap: 11px;
       color: var(--muted); text-decoration: none; transition: color .24s ease, padding .24s ease;
     }
     .index-number { color: var(--dim); font: 10px var(--mono); letter-spacing: .05em; transition: color .24s ease; }
     .index-title { font-size: 13px; letter-spacing: .015em; }
-    .index-arrow { justify-self: end; color: #d79d89; font-size: 14px; opacity: 0; transform: translate(-5px, 4px); transition: opacity .24s ease, transform .24s ease; }
-    .index-link:hover, .index-link:focus-visible { color: #f3e6dc; padding-inline: 4px; }
-    .index-link:hover .index-number, .index-link:focus-visible .index-number { color: #d8a48e; }
+    .index-arrow { justify-self: end; color: var(--blue); font-size: 14px; opacity: 0; transform: translate(-5px, 4px); transition: opacity .24s ease, transform .24s ease; }
+    .index-link:hover, .index-link:focus-visible { color: #e9f6ff; padding-inline: 4px; }
+    .index-link:hover .index-number, .index-link:focus-visible .index-number { color: var(--blue); }
     .index-link:hover .index-arrow, .index-link:focus-visible .index-arrow { opacity: 1; transform: translate(0, 0); }
     .artwork-stage {
-      grid-column: 2; grid-row: 1; position: relative; justify-self: center; width: min(100%, 850px);
-      height: min(77svh, 780px); min-height: 430px; overflow: hidden; isolation: isolate; border-radius: 50%;
-      background: radial-gradient(ellipse at 51% 49%, rgba(64, 35, 49, .22), rgba(32, 20, 30, .08) 34%, transparent 69%);
+      grid-column: 2; grid-row: 1; position: relative; justify-self: center; width: min(100%, 790px, 76svh);
+      aspect-ratio: 1; isolation: isolate; overflow: hidden;
+      background: radial-gradient(ellipse at 50% 50%, rgba(18, 73, 130, .20), rgba(7, 22, 42, .08) 43%, transparent 72%);
     }
-    .artwork-stage::before {
-      content: ""; position: absolute; z-index: 0; inset: 7%; border-radius: 50%;
-      background: radial-gradient(ellipse at 48% 55%, rgba(184, 101, 90, .08), transparent 58%),
-        radial-gradient(ellipse at 57% 41%, rgba(109, 114, 157, .08), transparent 48%);
-      filter: blur(18px); pointer-events: none;
-    }
-    .sculpture, .art-fallback { position: absolute; z-index: 2; inset: 0; display: block; width: 100%; height: 100%; }
-    .sculpture { opacity: 0; transition: opacity .9s ease; }
-    .art-fallback { z-index: 1; overflow: visible; transform: scale(1.18); transition: opacity .8s ease; }
-    .artwork-stage[data-webgl="ready"] .sculpture { opacity: .98; }
-    .artwork-stage[data-webgl="ready"] .art-fallback { opacity: 0; visibility: hidden; }
-    .art-caption { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-    .endmark { width: 100%; padding: 0 0 max(25px, env(safe-area-inset-bottom)); color: #71686c; font: 9px var(--mono); letter-spacing: .16em; text-align: right; }
-    @media (min-width: 1501px) { .exhibition { gap: 84px; } }
-    @media (max-width: 900px) {
+    .artwork-stage::before { content: ""; position: absolute; z-index: 0; inset: 9%; border-radius: 50%; background: radial-gradient(circle, rgba(44, 146, 218, .09), transparent 67%); filter: blur(22px); pointer-events: none; }
+    .orbit-lines, .earth-scene, .globe-fallback { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+    .orbit-lines { z-index: 1; overflow: visible; fill: none; stroke: rgba(98, 181, 231, .31); stroke-width: 1; }
+    .orbit-lines .orbit-soft { stroke: rgba(91, 157, 209, .17); stroke-width: .8; }
+    .orbit-lines .orbit-dash { stroke: rgba(104, 208, 248, .56); stroke-width: 1.15; stroke-dasharray: 3 12; animation: orbit-drift 76s linear infinite; }
+    .artwork-stage[data-paused="true"] .orbit-dash { animation-play-state: paused; }
+    .orbit-node { fill: #9ce9ff; stroke: rgba(81, 188, 245, .56); stroke-width: 7; paint-order: stroke; filter: drop-shadow(0 0 7px rgba(94, 207, 255, .72)); }
+    .globe-fallback { z-index: 2; inset: 16%; width: 68%; height: 68%; border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 36% 31%, #3779a7, #0c3357 49%, #061527 78%); box-shadow: 0 0 0 1px rgba(129, 215, 255, .37), 0 0 28px rgba(33, 147, 223, .25), 0 0 86px rgba(27, 119, 204, .19), inset -26px -10px 56px rgba(0, 0, 0, .66); transition: opacity .7s ease, visibility .7s ease; }
+    .globe-fallback img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; filter: saturate(1.14) hue-rotate(4deg) brightness(.82); }
+    .globe-fallback::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 32% 29%, rgba(90, 189, 255, .06), transparent 38%), linear-gradient(113deg, rgba(10, 61, 106, .02) 38%, rgba(1, 8, 20, .60) 100%); box-shadow: inset -14px -4px 42px rgba(2, 9, 20, .48), inset 0 0 20px rgba(101, 186, 239, .14); }
+    .earth-scene { z-index: 3; opacity: 0; transition: opacity .8s ease; }
+    .artwork-stage[data-webgl="ready"] .earth-scene { opacity: 1; }
+    .artwork-stage[data-webgl="ready"] .globe-fallback { opacity: 0; visibility: hidden; }
+    .stage-label, .stage-footnote { position: absolute; z-index: 4; color: #a7c6e4; font: 8px/1.5 var(--mono); letter-spacing: .16em; text-transform: uppercase; pointer-events: none; }
+    .stage-label { top: 12%; left: 8%; display: flex; align-items: center; gap: 8px; }
+    .stage-label::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #70d9ff; box-shadow: 0 0 11px #55caff; }
+    .stage-footnote { right: 8%; bottom: 12%; color: #7898b7; letter-spacing: .11em; }
+    .art-caption { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    .endmark { display: flex; justify-content: space-between; align-items: flex-start; gap: 28px; padding: 0 0 max(25px, env(safe-area-inset-bottom)); color: #7088a1; font: 9px/1.8 var(--mono); letter-spacing: .05em; }
+    .endmark p { margin: 0; }
+    .endmark a { color: #9dbad4; text-underline-offset: 3px; }
+    .copyright { flex: 0 0 auto; letter-spacing: .14em; }
+    @keyframes orbit-drift { to { stroke-dashoffset: -240; } }
+    @media (max-width: 1040px) {
       .frame { width: calc(100% - 56px); }
-      .exhibition { grid-template-columns: minmax(225px, .78fr) minmax(0, 1.2fr); gap: 25px; }
-      .artwork-stage { height: min(70svh, 660px); min-height: 390px; }
+      .exhibition { grid-template-columns: minmax(220px, .74fr) minmax(0, 1.26fr); gap: 26px; }
       .index-link { min-height: 54px; }
+      .stage-label { left: 5%; }
     }
-    @media (max-width: 700px) {
+    @media (max-width: 760px) {
       .frame { width: calc(100% - 40px); }
       .masthead { height: 72px; }
       .wordmark { gap: 10px; }
       .wordmark-mark { font-size: 19px; }
       .wordmark-name { font-size: 9px; }
       main { min-height: auto; }
-      .exhibition { min-height: auto; display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 0 0 43px; }
-      .artwork-stage { order: 0; align-self: center; width: min(100%, 540px); height: min(112vw, 53svh); min-height: 290px; max-height: 470px; margin: 0 0 2px; }
-      .copy { order: 1; padding: 0 0 12px; }
-      h1 { font-size: clamp(42px, 11vw, 58px); line-height: 1.2; }
-      .index { margin-top: 34px; }
-      .index-link { min-height: 62px; grid-template-columns: 34px 1fr 22px; gap: 10px; }
+      .exhibition { min-height: auto; display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 0 0 36px; }
+      .artwork-stage { order: 0; align-self: center; width: min(calc(100% + 24px), 560px); aspect-ratio: 1; margin: -3px -12px 5px; }
+      .copy { order: 1; padding: 0 0 15px; }
+      .eyebrow { margin: 0 0 18px; }
+      h1 { font-size: clamp(42px, 10.6vw, 58px); line-height: 1.2; }
+      .intro { margin-top: 14px; font-size: 12px; }
+      .index { margin-top: 31px; }
+      .index-link { min-height: 61px; grid-template-columns: 34px minmax(0, 1fr) 22px; gap: 10px; }
       .index-title { font-size: 14px; }
-      .index-arrow { opacity: .72; transform: none; }
-      .endmark { padding-top: 0; text-align: left; }
+      .index-arrow { opacity: .76; transform: none; }
+      .endmark { flex-direction: column; gap: 9px; padding-top: 0; }
+      .copyright { order: 2; }
     }
-    @media (max-width: 360px) {
+    @media (max-width: 380px) {
       .frame { width: calc(100% - 32px); }
-      .artwork-stage { min-height: 274px; }
-      .index-link { min-height: 60px; }
+      .artwork-stage { width: min(calc(100% + 24px), 560px); }
+      .stage-label { top: 10%; left: 4%; font-size: 7px; }
+      .stage-footnote { right: 4%; bottom: 10%; font-size: 7px; }
+      .index-link { min-height: 59px; }
       .index-title { font-size: 13px; }
+      .endmark { font-size: 8px; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition-duration: .01ms !important; }
     }
   </style>
 </head>
@@ -132,41 +149,25 @@
   </header>
   <main id="main" class="frame">
     <section class="exhibition" aria-labelledby="page-title">
-      <div class="artwork-stage" id="artwork" data-webgl="fallback" aria-hidden="true">
-        <canvas class="sculpture" id="sculpture"></canvas>
-        <svg class="art-fallback" viewBox="0 0 900 900" role="presentation" focusable="false">
-          <defs>
-            <radialGradient id="body" cx="42%" cy="34%" r="70%">
-              <stop offset="0" stop-color="#f5c9ae" stop-opacity=".74"/>
-              <stop offset=".24" stop-color="#ca7c78" stop-opacity=".64"/>
-              <stop offset=".56" stop-color="#6b405b" stop-opacity=".68"/>
-              <stop offset="1" stop-color="#171624" stop-opacity=".96"/>
-            </radialGradient>
-            <linearGradient id="silk" x1=".14" y1=".06" x2=".91" y2=".94">
-              <stop stop-color="#ffddbd" stop-opacity=".9"/><stop offset=".36" stop-color="#da8d83" stop-opacity=".72"/>
-              <stop offset=".7" stop-color="#a58caf" stop-opacity=".8"/><stop offset="1" stop-color="#92d3cf" stop-opacity=".8"/>
-            </linearGradient>
-            <linearGradient id="silk2" x1=".9" y1=".12" x2=".1" y2=".91">
-              <stop stop-color="#a8d9d1" stop-opacity=".82"/><stop offset=".43" stop-color="#9d83a5" stop-opacity=".72"/>
-              <stop offset=".78" stop-color="#e6a084" stop-opacity=".88"/><stop offset="1" stop-color="#f5d6bf" stop-opacity=".76"/>
-            </linearGradient>
-            <filter id="soft-glow" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="24"/></filter>
-          </defs>
-          <ellipse cx="454" cy="469" rx="281" ry="275" fill="#b05f78" opacity=".13" filter="url(#soft-glow)"/>
-          <path d="M450 176 C600 168 702 286 680 426 C658 570 526 723 431 695 C335 667 238 529 256 394 C275 259 343 184 450 176Z" fill="url(#body)" stroke="url(#silk)" stroke-opacity=".46" stroke-width="2"/>
-          <g fill="none" stroke-linecap="round">
-            <path d="M286 475 C293 311 385 194 480 201 C570 208 638 336 611 469 C585 602 463 681 374 625 C292 574 287 438 354 344 C417 256 559 251 632 345 C695 426 642 554 557 612 C468 674 342 634 296 537 C251 443 312 317 418 283 C522 249 637 319 660 416 C683 510 580 614 478 620 C373 627 290 541 300 437" stroke="url(#silk)" stroke-width="8" opacity=".87"/>
-            <path d="M332 250 C468 288 597 350 625 447 C652 541 550 644 451 638 C350 632 265 527 286 420 C307 313 436 237 537 267 C638 297 693 420 648 514 C601 610 468 654 377 598 C286 542 269 410 322 330 C375 250 505 231 588 292 C671 353 675 480 607 555" stroke="url(#silk2)" stroke-width="3.4" opacity=".72"/>
-            <path d="M369 208 C291 324 296 475 375 572 C455 671 592 674 652 574 C712 474 662 329 570 267 C478 205 353 246 310 353 C267 460 330 584 431 615 C532 645 644 570 655 467 C667 364 580 278 481 278 C382 278 305 366 314 456" stroke="#f4c5aa" stroke-width="1.6" opacity=".66"/>
-            <path d="M289 444 C354 519 438 549 525 520 C612 491 665 412 648 332 M305 496 C383 568 484 581 565 532 C646 484 677 393 644 319 M319 547 C403 609 509 606 586 547 C663 489 682 393 640 319" stroke="#f1baa5" stroke-width="1.15" opacity=".34"/>
-            <path d="M370 353 C421 310 499 310 544 354 C591 400 586 474 536 516 C484 559 410 552 370 504 C330 455 337 386 383 350 C429 313 494 325 528 369 C563 414 550 471 509 500 C468 529 418 514 393 479 C368 444 380 402 412 384 C444 366 484 379 497 408 C510 437 493 463 469 470" stroke="#f9d7c0" stroke-width="1.4" opacity=".72"/>
-          </g>
-          <ellipse cx="441" cy="411" rx="112" ry="171" fill="none" stroke="#e4a28f" stroke-opacity=".18" stroke-width="17" transform="rotate(37 441 411)"/>
+      <figure class="artwork-stage" id="artwork" data-webgl="loading" data-paused="true" role="img" aria-labelledby="earth-caption">
+        <svg class="orbit-lines" viewBox="0 0 900 900" aria-hidden="true" focusable="false">
+          <ellipse class="orbit-soft" cx="450" cy="450" rx="402" ry="156" transform="rotate(-24 450 450)" />
+          <ellipse class="orbit-dash" cx="450" cy="450" rx="380" ry="255" transform="rotate(62 450 450)" />
+          <ellipse cx="450" cy="450" rx="340" ry="310" transform="rotate(-68 450 450)" />
+          <circle class="orbit-node" cx="783" cy="320" r="4.5" />
+          <circle class="orbit-node" cx="149" cy="527" r="3.5" />
+          <circle class="orbit-node" cx="676" cy="775" r="3" />
         </svg>
-        <span class="art-caption">一件由光线与流动曲面构成的虹彩生成式雕塑</span>
-      </div>
+        <div class="globe-fallback" aria-hidden="true"><img src="/assets/earth-blue-marble.webp" alt="" fetchpriority="high" decoding="async"></div>
+        <canvas class="earth-scene" id="earth-scene" aria-hidden="true"></canvas>
+        <span class="stage-label" aria-hidden="true">PLANET / EARTH</span>
+        <span class="stage-footnote" aria-hidden="true">ARTISTIC STUDY · NOT TO SCALE</span>
+        <figcaption class="art-caption" id="earth-caption">以 NASA Earth Observatory 的 Blue Marble: Next Generation 全球影像为底图构建的科技蓝地球艺术场景。大气辉光、经纬网、扫描光与轨道仅为装饰示意，不提供精确地理定位或科学测量，也不代表 NASA 背书。</figcaption>
+      </figure>
       <div class="copy">
+        <p class="eyebrow">DIGITAL ORBIT &nbsp; / &nbsp; 01</p>
         <h1 id="page-title">光在生长。</h1>
+        <p class="intro">蓝色星球，四段数字实践。</p>
         <nav aria-label="作品索引">
           <ol class="index">
             <li><a class="index-link" href="https://kuntechnology.github.io/ui-style-gallery/" target="_blank" rel="noopener noreferrer"><span class="index-number">01</span><span class="index-title">UI 设计风格集锦</span><span class="index-arrow" aria-hidden="true">↗</span><span class="art-caption">（新标签页打开）</span></a></li>
@@ -177,7 +178,10 @@
         </nav>
       </div>
     </section>
-    <footer class="endmark">© KUNTECHNOLOGY</footer>
+    <footer class="endmark">
+      <p>球面底图：<a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/" target="_blank" rel="noopener noreferrer">NASA Earth Observatory</a> · Blue Marble: Next Generation。NASA 未参与或背书；网格与轨道为装饰示意，非精确地理或科学可视化。</p>
+      <p class="copyright">© KUNTECHNOLOGY</p>
+    </footer>
   </main>
   <script defer src="/assets/gsap-3.15.0.min.js"></script>
   <script defer src="/assets/visual-effects.js"></script>
