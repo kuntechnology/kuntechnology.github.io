@@ -1,432 +1,196 @@
-/* Kuntechnology root-site visual effects. GSAP is loaded locally before this file. */
+/* Generative artwork for the Kuntechnology root exhibition. Local-only, graceful by default. */
 (() => {
   'use strict';
 
-  const $ = (selector, root = document) => root.querySelector(selector);
-  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const mapPanel = $('#project-map');
-  const glCanvas = $('#energy-field');
-  const cards = $$('.project-card');
-  const mapNodes = $$('.node-link');
-  const mapCore = $('.map-core');
-  const mapGlow = $('.map-core-glow');
-  const search = $('#project-search');
-  const filters = $$('.filter-btn');
+  const stage = document.getElementById('artwork');
+  const glCanvas = document.getElementById('sculpture');
+  const ambientCanvas = document.getElementById('ambient');
+  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const fx = window.__kuntechFx = { webgl: 'fallback', canvas: 'fallback', gsap: 'static', reducedMotion: motion.matches, frames: 0 };
   const gsap = window.gsap || null;
-  const fx = window.__kuntechFx || (window.__kuntechFx = {});
-
-  fx.gsap = Boolean(gsap);
-  fx.gsapPaused = true;
-  fx.reducedMotion = motionQuery.matches;
-  fx.webgl = fx.webgl || { state: 'pending', frames: 0, animatedFrames: 0, paused: true };
-
-  function setEngine(name, state, label) {
-    const chip = document.getElementById(`${name}-engine`);
-    const value = document.getElementById(`${name}-value`);
-    if (chip) chip.dataset.state = state;
-    if (value) value.textContent = label;
-  }
-
-  const hasCanvas2D = Boolean($('#field')?.getContext('2d'));
-  if (hasCanvas2D) {
-    fx.canvas = fx.canvas || { state: 'ready', frames: 0, paused: true };
-    setEngine('canvas', motionQuery.matches ? 'static' : 'live', motionQuery.matches ? 'STATIC' : 'LIVE');
-  } else {
-    fx.canvas = { state: 'fallback', frames: 0, paused: true };
-    setEngine('canvas', 'fallback', 'CSS BACKUP');
-  }
+  let gl = null, program = null, buffer = null, resolutionLoc = null, timeLoc = null, pointerLoc = null, raf = 0, lastFrame = 0;
+  let width = 0, height = 0, dpr = 1, pointerX = 0.5, pointerY = 0.5, visible = true;
+  let ambientRaf = 0, ambientVisible = true, ambientCtx = null, ambientStart = () => {}, dust = [];
+  let entrance = null;
 
   const vertexSource = `
     attribute vec2 a_position;
-    void main() { gl_Position = vec4(a_position, 0.0, 1.0); }
+    void main(){ gl_Position = vec4(a_position, 0.0, 1.0); }
   `;
   const fragmentSource = `
     precision mediump float;
     uniform vec2 u_resolution;
     uniform float u_time;
     uniform vec2 u_pointer;
-    void main() {
-      vec2 p = (gl_FragCoord.xy - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y);
-      p += (u_pointer - 0.5) * 0.035;
-      float r = length(p);
-      float angle = atan(p.y, p.x);
-      float sphereRadius = 0.275;
-      float inside = 1.0 - smoothstep(sphereRadius - 0.012, sphereRadius + 0.006, r);
-      float latitude = asin(clamp(p.y / sphereRadius, -1.0, 1.0));
-      float longitudeLine = 1.0 - smoothstep(0.0, 0.075, abs(sin(angle * 15.0 + u_time * 0.10)));
-      float latitudeLine = 1.0 - smoothstep(0.0, 0.070, abs(sin(latitude * 18.0 - u_time * 0.06)));
-      float mesh = max(longitudeLine, latitudeLine * 0.72) * inside;
-      float rim = exp(-abs(r - sphereRadius) * 42.0) * 0.42;
-      float halo = exp(-r * 7.0) * 0.10;
-      float scanY = sin(u_time * 0.34) * 0.17;
-      float scan = exp(-abs(p.y - scanY) * 42.0) * inside * 0.10;
-      float pulse = 0.5 + 0.5 * sin(u_time * 0.72);
-      vec3 deep = vec3(0.018, 0.070, 0.145);
-      vec3 cyan = vec3(0.20, 0.82, 0.98);
-      vec3 violet = vec3(0.32, 0.24, 0.75);
-      vec3 color = mix(deep, cyan, mesh * 0.82 + rim * 0.36 + scan);
-      color += violet * inside * 0.16;
-      float alpha = clamp(inside * (0.22 + mesh * 0.24 + pulse * 0.035) + rim + halo + scan, 0.0, 0.58);
-      gl_FragColor = vec4(color, alpha);
+    mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
+    float sdTorus(vec3 p, vec2 t){ vec2 q=vec2(length(p.xz)-t.x,p.y); return length(q)-t.y; }
+    float smoothUnion(float a,float b,float k){ float h=clamp(.5+.5*(b-a)/k,0.0,1.0); return mix(b,a,h)-k*h*(1.0-h); }
+    float sculpture(vec3 p){
+      p.xz=rot(u_time*.105)*p.xz;
+      p.xy=rot(.30+sin(u_time*.18)*.055)*p.xy;
+      float ang=atan(p.z,p.x);
+      vec3 a=p;
+      a.xz*=1.0+.075*sin(ang*3.0+p.y*5.0+u_time*.34);
+      a.y+=.055*sin(ang*4.0+u_time*.23);
+      float d1=sdTorus(a,vec2(.58,.135+.012*sin(ang*3.0+u_time*.25)));
+      vec3 b=p;
+      b.xy=rot(1.12+sin(u_time*.12)*.045)*b.xy;
+      b.xz*=1.0+.055*sin(atan(b.z,b.x)*4.0-b.y*4.5-u_time*.27);
+      float d2=sdTorus(b,vec2(.55,.105));
+      return smoothUnion(d1,d2,.082);
+    }
+    vec3 normalAt(vec3 p){
+      vec2 e=vec2(.0018,0.0);
+      return normalize(vec3(sculpture(p+e.xyy)-sculpture(p-e.xyy),sculpture(p+e.yxy)-sculpture(p-e.yxy),sculpture(p+e.yyx)-sculpture(p-e.yyx)));
+    }
+    void main(){
+      vec2 uv=(gl_FragCoord.xy-.5*u_resolution)/min(u_resolution.x,u_resolution.y);
+      uv-=(u_pointer-.5)*.038;
+      uv*=1.18;
+      vec3 ro=vec3(0.0,0.0,3.12), rd=normalize(vec3(uv,-2.3));
+      float t=.0, d=.0; bool hit=false;
+      for(int i=0;i<92;i++){
+        vec3 p=ro+rd*t; d=sculpture(p);
+        if(d<.0018){ hit=true; break; }
+        t+=d*.78;
+        if(t>5.2) break;
+      }
+      if(!hit){ gl_FragColor=vec4(0.0); return; }
+      vec3 p=ro+rd*t, n=normalAt(p), viewDir=normalize(ro-p);
+      vec3 lightDir=normalize(vec3(-.62,.74,.72));
+      float diffuse=max(dot(n,lightDir),0.0);
+      float spec=pow(max(dot(reflect(-lightDir,n),viewDir),0.0),42.0);
+      float rim=pow(1.0-max(dot(n,viewDir),0.0),2.8);
+      float bands=.5+.5*sin(atan(p.z,p.x)*3.0+p.y*7.0+u_time*.18);
+      float threads=pow(.5+.5*sin(atan(p.z,p.x)*19.0+p.y*13.0+sin(p.y*7.0)),18.0);
+      vec3 wine=vec3(.20,.055,.105), rose=vec3(.78,.31,.28), pearl=vec3(.92,.69,.56), ice=vec3(.34,.67,.70);
+      vec3 base=mix(wine,rose,smoothstep(.12,.88,bands));
+      base=mix(base,pearl,smoothstep(.67,1.0,n.y)*.36);
+      base=mix(base,pearl,threads*.42);
+      vec3 color=base*(.19+1.02*diffuse)+vec3(1.0,.78,.66)*spec*.78;
+      color+=mix(vec3(.55,.20,.35),ice,smoothstep(-.28,.7,n.x))*(rim*.72);
+      color+=vec3(.55,.22,.31)*pow(max(dot(n,normalize(vec3(.7,.25,-.65))),0.0),9.0)*.22;
+      gl_FragColor=vec4(color,1.0);
     }
   `;
 
-  let gl = null;
-  let program = null;
-  let vertexBuffer = null;
-  let resolutionLocation = null;
-  let timeLocation = null;
-  let pointerLocation = null;
-  let glReady = false;
-  let glAttempted = false;
-  let glFrame = 0;
-  let glLastPaint = 0;
-  let glInView = true;
-  let glWidth = 0;
-  let glHeight = 0;
-  let pointerX = 0.5;
-  let pointerY = 0.5;
-  let mapObserver = null;
-
-  function setWebGL(state, label, renderer = state) {
-    if (mapPanel) mapPanel.dataset.renderer = renderer;
-    fx.webgl.state = state;
-    setEngine('webgl', state === 'live' ? 'live' : (state === 'fallback' || state === 'context-lost' ? 'fallback' : 'static'), label);
-  }
-
-  function stopWebGL() {
-    if (glFrame) cancelAnimationFrame(glFrame);
-    glFrame = 0;
-    fx.webgl.paused = true;
-  }
-
-  function compileShader(type, source) {
-    const shader = gl.createShader(type);
-    if (!shader) throw new Error('WebGL shader allocation failed');
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      const message = gl.getShaderInfoLog(shader) || 'WebGL shader compilation failed';
-      gl.deleteShader(shader);
-      throw new Error(message);
+  function shader(type, source){
+    const item=gl.createShader(type);
+    if(!item) throw new Error('Shader unavailable');
+    gl.shaderSource(item,source); gl.compileShader(item);
+    if(!gl.getShaderParameter(item,gl.COMPILE_STATUS)){
+      const message=gl.getShaderInfoLog(item)||'Shader compile failed'; gl.deleteShader(item); throw new Error(message);
     }
-    return shader;
+    return item;
   }
-
-  function sizeWebGL() {
-    if (!glReady || !gl || !mapPanel || !glCanvas) return;
-    const rect = mapPanel.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
-    const desiredDpr = Math.min(window.devicePixelRatio || 1, 1.25);
-    const pixelCap = Math.sqrt(900000 / (rect.width * rect.height));
-    const dpr = Math.max(0.75, Math.min(desiredDpr, pixelCap));
-    const width = Math.max(1, Math.round(rect.width * dpr));
-    const height = Math.max(1, Math.round(rect.height * dpr));
-    if (width !== glWidth || height !== glHeight) {
-      glWidth = width;
-      glHeight = height;
-      glCanvas.width = width;
-      glCanvas.height = height;
-      gl.viewport(0, 0, width, height);
-      drawWebGL(0);
-    }
+  function resizeGL(){
+    if(!gl||!stage||!glCanvas) return;
+    const box=stage.getBoundingClientRect(); if(!box.width||!box.height) return;
+    const pixelCap=motion.matches?360000:760000;
+    const scale=Math.min(window.devicePixelRatio||1,1.2,Math.sqrt(pixelCap/(box.width*box.height)));
+    const w=Math.max(1,Math.round(box.width*scale)), h=Math.max(1,Math.round(box.height*scale));
+    if(w===width&&h===height) return;
+    width=w;height=h;dpr=scale;glCanvas.width=w;glCanvas.height=h;gl.viewport(0,0,w,h);draw(0);
   }
-
-  function drawWebGL(timeSeconds) {
-    if (!glReady || !gl) return;
-    gl.useProgram(program);
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.enableVertexAttribArray(0);
-    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
-    gl.uniform2f(resolutionLocation, glCanvas.width, glCanvas.height);
-    gl.uniform1f(timeLocation, timeSeconds);
-    gl.uniform2f(pointerLocation, pointerX, pointerY);
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    fx.webgl.frames += 1;
-    if (timeSeconds > 0) fx.webgl.animatedFrames += 1;
+  function draw(seconds){
+    if(!gl||!program||!width||!height) return;
+    gl.useProgram(program);gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+    gl.uniform2f(resolutionLoc,width,height);
+    gl.uniform1f(timeLoc,seconds);
+    gl.uniform2f(pointerLoc,pointerX,pointerY);
+    gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);fx.frames++;
   }
-
-  function webGLCanRun() {
-    return glReady && glInView && !document.hidden && !motionQuery.matches;
+  function canAnimate(){return !motion.matches&&!document.hidden&&visible;}
+  function frame(now){
+    if(!canAnimate()){raf=0;return;}
+    if(now-lastFrame>=1000/30){draw(now*.001);lastFrame=now;}
+    raf=requestAnimationFrame(frame);
   }
-
-  function renderWebGL(time) {
-    if (!webGLCanRun()) {
-      glFrame = 0;
-      fx.webgl.paused = true;
-      return;
-    }
-    if (time - glLastPaint >= 1000 / 30) {
-      drawWebGL(time * 0.001);
-      glLastPaint = time;
-    }
-    glFrame = requestAnimationFrame(renderWebGL);
+  function syncGL(){
+    if(!gl) return;
+    if(canAnimate()){if(!raf) raf=requestAnimationFrame(frame);}
+    else {if(raf)cancelAnimationFrame(raf);raf=0;if(motion.matches)draw(0);}
   }
-
-  function syncWebGL() {
-    if (!glReady) return;
-    if (!webGLCanRun()) {
-      stopWebGL();
-      if (motionQuery.matches) drawWebGL(0);
-      return;
-    }
-    if (!glFrame) {
-      fx.webgl.paused = false;
-      glFrame = requestAnimationFrame(renderWebGL);
+  function initGL(){
+    if(!stage||!glCanvas) return;
+    try{
+      gl=glCanvas.getContext('webgl',{alpha:true,antialias:false,depth:false,stencil:false,powerPreference:'low-power'})||glCanvas.getContext('experimental-webgl',{alpha:true,antialias:false,depth:false,stencil:false,powerPreference:'low-power'});
+      if(!gl) throw new Error('WebGL unavailable');
+      const debugInfo=gl.getExtension('WEBGL_debug_renderer_info');
+      const renderer=debugInfo?gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL):'';
+      if(/swiftshader|llvmpipe|software rasterizer|softpipe/i.test(renderer)) throw new Error('Software WebGL renderer; retain static artwork');
+      const vs=shader(gl.VERTEX_SHADER,vertexSource), fs=shader(gl.FRAGMENT_SHADER,fragmentSource);
+      program=gl.createProgram(); if(!program) throw new Error('Program unavailable');
+      gl.attachShader(program,vs);gl.attachShader(program,fs);gl.bindAttribLocation(program,0,'a_position');gl.linkProgram(program);
+      gl.deleteShader(vs);gl.deleteShader(fs);
+      if(!gl.getProgramParameter(program,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program)||'Program link failed');
+      buffer=gl.createBuffer();if(!buffer) throw new Error('Buffer unavailable');
+      gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+      resolutionLoc=gl.getUniformLocation(program,'u_resolution');timeLoc=gl.getUniformLocation(program,'u_time');pointerLoc=gl.getUniformLocation(program,'u_pointer');
+      gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+      stage.dataset.webgl='ready';fx.webgl='ready';resizeGL();syncGL();
+      if('ResizeObserver'in window){const observer=new ResizeObserver(resizeGL);observer.observe(stage);}
+      stage.addEventListener('pointermove',event=>{
+        const box=stage.getBoundingClientRect();pointerX=Math.max(0,Math.min(1,(event.clientX-box.left)/box.width));pointerY=1-Math.max(0,Math.min(1,(event.clientY-box.top)/box.height));
+      },{passive:true});
+      stage.addEventListener('pointerleave',()=>{pointerX=pointerY=.5;},{passive:true});
+      glCanvas.addEventListener('webglcontextlost',event=>{event.preventDefault();if(raf)cancelAnimationFrame(raf);raf=0;gl=null;program=null;buffer=null;stage.dataset.webgl='fallback';fx.webgl='context-lost';});
+      glCanvas.addEventListener('webglcontextrestored',()=>{gl=null;initGL();});
+    }catch(_){
+      gl=null;program=null;buffer=null;stage.dataset.webgl='fallback';fx.webgl='fallback';
     }
   }
 
-  function setupWebGL() {
-    if (!mapPanel || !glCanvas) return false;
-    const rect = mapPanel.getBoundingClientRect();
-    if (!rect.width || !rect.height) return false;
-    glAttempted = true;
-    try {
-      const options = { alpha: true, antialias: false, depth: false, stencil: false, powerPreference: 'low-power' };
-      gl = glCanvas.getContext('webgl', options) || glCanvas.getContext('experimental-webgl', options);
-      if (!gl) throw new Error('WebGL unavailable');
-      const vertexShader = compileShader(gl.VERTEX_SHADER, vertexSource);
-      const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fragmentSource);
-      program = gl.createProgram();
-      if (!program) throw new Error('WebGL program allocation failed');
-      gl.attachShader(program, vertexShader);
-      gl.attachShader(program, fragmentShader);
-      gl.bindAttribLocation(program, 0, 'a_position');
-      gl.linkProgram(program);
-      gl.deleteShader(vertexShader);
-      gl.deleteShader(fragmentShader);
-      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program) || 'WebGL program link failed');
-      vertexBuffer = gl.createBuffer();
-      if (!vertexBuffer) throw new Error('WebGL buffer allocation failed');
-      gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-      resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
-      timeLocation = gl.getUniformLocation(program, 'u_time');
-      pointerLocation = gl.getUniformLocation(program, 'u_pointer');
-      gl.enable(gl.BLEND);
-      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-      glReady = true;
-      fx.webgl.frames = 0;
-      fx.webgl.animatedFrames = 0;
-      setWebGL('live', motionQuery.matches ? 'STATIC' : 'LIVE', 'webgl');
-      glCanvas.style.opacity = '0.92';
-      sizeWebGL();
-      if (!mapObserver && 'IntersectionObserver' in window) {
-        mapObserver = new IntersectionObserver(entries => {
-          const entry = entries[0];
-          glInView = Boolean(entry && entry.isIntersecting);
-          syncWebGL();
-        }, { threshold: 0.08 });
-        mapObserver.observe(mapPanel);
+  function initAmbient(){
+    if(!ambientCanvas) return;
+    ambientCtx=ambientCanvas.getContext('2d',{alpha:true});
+    if(!ambientCtx){fx.canvas='fallback';return;}
+    fx.canvas='ready';
+    let seed=71231;const random=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
+    const count=Math.min(34,Math.max(15,Math.round(window.innerWidth/38)));
+    dust=Array.from({length:count},()=>({x:random(),y:random(),r:.35+random()*.8,phase:random()*6.28,speed:.000035+random()*.000065}));
+    function size(){const scale=Math.min(window.devicePixelRatio||1,1);ambientCanvas.width=Math.max(1,Math.round(innerWidth*scale));ambientCanvas.height=Math.max(1,Math.round(innerHeight*scale));ambientCtx.setTransform(scale,0,0,scale,0,0);}
+    size();window.addEventListener('resize',size,{passive:true});
+    function paint(now){
+      if(!ambientVisible||document.hidden||motion.matches){ambientRaf=0;return;}
+      const ctx=ambientCtx;ctx.clearRect(0,0,innerWidth,innerHeight);
+      for(const point of dust){
+        const y=(point.y+(now*point.speed))%1;
+        const shimmer=.35+.65*(.5+.5*Math.sin(now*.00022+point.phase));
+        ctx.beginPath();ctx.arc(point.x*innerWidth,y*innerHeight,point.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(218,166,151,${.11*shimmer})`;ctx.fill();
       }
-      syncWebGL();
-      return true;
-    } catch (_) {
-      glReady = false;
-      stopWebGL();
-      if (program && gl) gl.deleteProgram(program);
-      if (vertexBuffer && gl) gl.deleteBuffer(vertexBuffer);
-      program = null;
-      vertexBuffer = null;
-      if (glCanvas) glCanvas.style.opacity = '0';
-      setWebGL('fallback', 'CSS STATIC', 'fallback');
-      return false;
+      ambientRaf=requestAnimationFrame(paint);
     }
+    const start=()=>{if(!ambientRaf&&!motion.matches&&!document.hidden)ambientRaf=requestAnimationFrame(paint);};
+    ambientStart=start;
+    const stop=()=>{if(ambientRaf)cancelAnimationFrame(ambientRaf);ambientRaf=0;};
+    if('IntersectionObserver'in window){const observer=new IntersectionObserver(entries=>{ambientVisible=Boolean(entries[0]?.isIntersecting);ambientVisible?start():stop();});observer.observe(document.body);}
+    start();window.addEventListener('resize',start,{passive:true});
   }
 
-  if (mapPanel && glCanvas) {
-    glCanvas.addEventListener('webglcontextlost', event => {
-      event.preventDefault();
-      glReady = false;
-      stopWebGL();
-      glCanvas.style.opacity = '0';
-      setWebGL('context-lost', 'STATIC BACKUP', 'context-lost');
-    });
-    glCanvas.addEventListener('webglcontextrestored', () => {
-      glReady = false;
-      setupWebGL();
-    });
-    mapPanel.addEventListener('pointermove', event => {
-      const rect = mapPanel.getBoundingClientRect();
-      if (rect.width && rect.height) {
-        pointerX = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
-        pointerY = 1 - Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
-      }
-    }, { passive: true });
-    mapPanel.addEventListener('pointerleave', () => { pointerX = 0.5; pointerY = 0.5; }, { passive: true });
-    if (mapPanel.getBoundingClientRect().width) {
-      setupWebGL();
-    } else {
-      setWebGL('static-mobile', 'MOBILE STATIC', 'static-mobile');
-    }
-    if ('ResizeObserver' in window) {
-      const resizeObserver = new ResizeObserver(() => sizeWebGL());
-      resizeObserver.observe(mapPanel);
-    }
-    window.addEventListener('resize', () => {
-      if (!glReady && !glAttempted && mapPanel.getBoundingClientRect().width) setupWebGL();
-      else { sizeWebGL(); syncWebGL(); }
-    }, { passive: true });
-  } else {
-    setWebGL('fallback', 'CSS STATIC', 'fallback');
+  function motionChange(event){
+    const reduced=typeof event?.matches==='boolean'?event.matches:window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    fx.reducedMotion=reduced;fx.gsap=reduced?'reduced':(gsap?'ready':'unavailable');syncGL();
+    if(reduced){
+      if(ambientRaf)cancelAnimationFrame(ambientRaf);ambientRaf=0;
+      if(entrance){entrance.progress(1).pause();gsap.set(['.artwork-stage','#page-title','.index li'],{clearProps:'opacity,transform,visibility'});}
+    }else if(!document.hidden){if(gl&&!raf)raf=requestAnimationFrame(frame);ambientStart();}
   }
-
-  const hoverTweens = new WeakMap();
-  const revealTweens = new WeakMap();
-  let introTimeline = null;
-  let corePulse = null;
-  let revealObserver = null;
-  let gsapStarted = false;
-
-  function shouldAnimate() {
-    return Boolean(gsap && !motionQuery.matches && !document.hidden);
-  }
-
-  function animateCardIn(card, delay = 0) {
-    if (!shouldAnimate() || card.hidden) return;
-    const rect = card.getBoundingClientRect();
-    if (rect.bottom < 0 || rect.top > window.innerHeight) return;
-    revealTweens.get(card)?.kill();
-    const tween = gsap.fromTo(card,
-      { opacity: 0, y: 14 },
-      { opacity: 1, y: 0, duration: 0.48, delay, ease: 'power2.out', overwrite: 'auto', onComplete: () => {
-        gsap.set(card, { clearProps: 'opacity,transform' });
-        revealTweens.delete(card);
-      } }
-    );
-    revealTweens.set(card, tween);
-  }
-
-  function ensureRevealObserver() {
-    if (revealObserver || !('IntersectionObserver' in window)) return;
-    revealObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          animateCardIn(entry.target);
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.14, rootMargin: '0px 0px -5% 0px' });
-    cards.forEach(card => revealObserver.observe(card));
-  }
-
-  function playGSAP() {
-    if (!gsap || !shouldAnimate() || gsapStarted) return;
-    gsapStarted = true;
-    fx.gsapPaused = false;
-    document.documentElement.dataset.gsap = 'ready';
-    setEngine('gsap', 'live', 'READY');
-    introTimeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
-    introTimeline
-      .fromTo('.hero-intro .eyebrow', { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.48 }, 0)
-      .fromTo('#page-title', { autoAlpha: 0, y: 23 }, { autoAlpha: 1, y: 0, duration: 0.72 }, 0.06)
-      .fromTo('.hero-copy', { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.62 }, 0.16)
-      .fromTo('.hero-actions', { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.54 }, 0.25)
-      .fromTo('.hero-facts', { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.5 }, 0.32)
-      .fromTo('.map-panel', { autoAlpha: 0, scale: 0.965 }, { autoAlpha: 1, scale: 1, duration: 0.88 }, 0.1)
-      .fromTo(mapNodes, { autoAlpha: 0, scale: 0.82, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: 0.62, stagger: 0.085, ease: 'back.out(1.45)' }, 0.55);
-    if (mapGlow) {
-      corePulse = gsap.to(mapGlow, { scale: 1.08, opacity: 0.78, transformOrigin: '50% 50%', duration: 2.8, ease: 'sine.inOut', repeat: -1, yoyo: true });
-    }
-    ensureRevealObserver();
-  }
-
-  function stopGSAPForReducedMotion() {
-    if (!gsap) return;
-    if (introTimeline) introTimeline.kill();
-    if (corePulse) corePulse.kill();
-    introTimeline = null;
-    corePulse = null;
-    cards.forEach(card => {
-      revealTweens.get(card)?.kill();
-      const launch = $('.launch', card);
-      if (launch) hoverTweens.get(launch)?.kill();
-    });
-    if (mapCore) hoverTweens.get(mapCore)?.kill();
-    gsap.killTweensOf([mapGlow, mapCore, ...mapNodes, ...cards, ...cards.map(card => $('.launch', card)).filter(Boolean)].filter(Boolean));
-    gsap.set(['.hero-intro > *', '.map-panel', '.node-link', '.map-core-glow', '.map-core', '.project-card', '.launch'], { clearProps: 'opacity,transform,visibility' });
-    gsapStarted = false;
-    fx.gsapPaused = true;
-    document.documentElement.dataset.gsap = 'static';
-    setEngine('gsap', 'static', 'STATIC');
-  }
-
-  if (gsap) {
-    setEngine('gsap', motionQuery.matches ? 'static' : 'live', motionQuery.matches ? 'STATIC' : 'READY');
-    document.documentElement.dataset.gsap = motionQuery.matches ? 'static' : 'ready';
-    if (!motionQuery.matches && !document.hidden) playGSAP();
-    if (cards.length) {
-      const visibleState = new Map(cards.map(card => [card, !card.hidden]));
-      const animateNewCards = () => requestAnimationFrame(() => {
-        let order = 0;
-        cards.forEach(card => {
-          const visible = !card.hidden;
-          if (visible && !visibleState.get(card)) animateCardIn(card, order++ * 0.045);
-          visibleState.set(card, visible);
-        });
-      });
-      filters.forEach(button => button.addEventListener('click', animateNewCards));
-      search?.addEventListener('input', animateNewCards);
-      document.addEventListener('keydown', event => {
-        if (event.key === 'Escape' && document.activeElement === search) animateNewCards();
-      });
-    }
-
-    const coreFeedback = active => {
-      if (!shouldAnimate() || !mapCore) return;
-      hoverTweens.get(mapCore)?.kill();
-      const tween = gsap.to(mapCore, { scale: active ? 1.11 : 1, transformOrigin: '50% 50%', duration: active ? 0.24 : 0.34, ease: active ? 'back.out(2)' : 'power2.out', overwrite: 'auto' });
-      hoverTweens.set(mapCore, tween);
-    };
-    [...cards, ...mapNodes].forEach(item => {
-      item.addEventListener('pointerenter', () => coreFeedback(true));
-      item.addEventListener('pointerleave', () => coreFeedback(false));
-      item.addEventListener('focus', () => coreFeedback(true));
-      item.addEventListener('blur', () => coreFeedback(false));
-    });
-  } else {
-    fx.gsapPaused = true;
-    document.documentElement.dataset.gsap = 'fallback';
-    setEngine('gsap', 'fallback', 'CSS ONLY');
-  }
-
-  function onMotionPreferenceChange() {
-    fx.reducedMotion = motionQuery.matches;
-    if (motionQuery.matches) {
-      stopGSAPForReducedMotion();
-      if (glReady) drawWebGL(0);
-    } else if (!document.hidden) {
-      if (gsap) playGSAP();
-    }
-    syncWebGL();
-    if (fx.canvas) fx.canvas.paused = motionQuery.matches || document.hidden;
-    setEngine('canvas', !hasCanvas2D ? 'fallback' : (motionQuery.matches ? 'static' : 'live'), !hasCanvas2D ? 'CSS BACKUP' : (motionQuery.matches ? 'STATIC' : 'LIVE'));
-  }
-
-  if (motionQuery.addEventListener) motionQuery.addEventListener('change', onMotionPreferenceChange);
-  else motionQuery.addListener?.(onMotionPreferenceChange);
-
-  document.addEventListener('visibilitychange', () => {
-    const paused = document.hidden || motionQuery.matches;
-    if (gsap) {
-      if (paused) {
-        gsap.globalTimeline.pause();
-        fx.gsapPaused = true;
-      } else {
-        if (!gsapStarted) playGSAP();
-        gsap.globalTimeline.resume();
-        fx.gsapPaused = false;
-      }
-    }
-    syncWebGL();
-    if (fx.canvas) fx.canvas.paused = paused;
+  if(motion.addEventListener)motion.addEventListener('change',motionChange);else motion.addListener?.(motionChange);
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden){if(raf)cancelAnimationFrame(raf);if(ambientRaf)cancelAnimationFrame(ambientRaf);raf=ambientRaf=0;}
+    else{syncGL();if(!motion.matches&&ambientCtx)ambientStart();}
   });
+  window.addEventListener('pagehide',()=>{if(raf)cancelAnimationFrame(raf);if(ambientRaf)cancelAnimationFrame(ambientRaf);raf=ambientRaf=0;});
 
-  window.addEventListener('pagehide', () => {
-    stopWebGL();
-    if (gsap) gsap.globalTimeline.pause();
-  });
+  initAmbient();initGL();
+  if(gsap&&!motion.matches){
+    fx.gsap='ready';
+    entrance=gsap.timeline({defaults:{ease:'power2.out'}})
+      .fromTo('.artwork-stage',{autoAlpha:0,scale:.975},{autoAlpha:1,scale:1,duration:1.25},0)
+      .fromTo('#page-title',{autoAlpha:0,y:9},{autoAlpha:1,y:0,duration:.75},.22)
+      .fromTo('.index li',{autoAlpha:0,y:8},{autoAlpha:1,y:0,duration:.65,stagger:.075},.35);
+  }else{fx.gsap=gsap?'reduced':'unavailable';}
 })();

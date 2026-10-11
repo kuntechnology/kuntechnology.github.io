@@ -2,404 +2,184 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#080b13">
-  <meta name="description" content="Kuntechnology 数字作品集：用可降级 WebGL、Canvas 粒子与交互星图探索设计资源、实用工具与技术指南。">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0a0f">
+  <meta name="description" content="光在生长。Kuntechnology 的数字艺术作品与四个交互项目。">
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://kuntechnology.github.io/">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="数字现场 · Kuntechnology">
-  <meta property="og:description" content="四个不重复项目入口。可降级 WebGL、Canvas 粒子与 GSAP 交互星图。">
+  <meta property="og:title" content="光在生长。 · Kuntechnology">
+  <meta property="og:description" content="一件生成中的数字雕塑，四个作品入口。">
   <meta property="og:url" content="https://kuntechnology.github.io/">
-  <title>数字现场 · Kuntechnology</title>
+  <title>光在生长。 · Kuntechnology</title>
   <style>
     :root {
       color-scheme: dark;
-      --void: #080b13;
-      --panel: #0e1320;
-      --panel-hi: #121a2a;
-      --ink: #f2f4f7;
-      --muted: #a1aec1;
-      --faint: #748198;
-      --line: rgba(188, 205, 232, .15);
-      --lime: #cbff65;
-      --cyan: #6ce8ff;
-      --pink: #ff77ba;
-      --violet: #a89cff;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --ink: #eee8e1;
+      --muted: #a69b98;
+      --dim: #746c70;
+      --ground: #0b0a0f;
+      --line: rgba(227, 213, 204, .17);
+      --serif: "Songti SC", "Noto Serif CJK SC", STSong, "Yu Mincho", ui-serif, Georgia, serif;
       --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      --max: 1180px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
     *, *::before, *::after { box-sizing: border-box; }
-    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+    html { min-width: 320px; background: var(--ground); scroll-behavior: smooth; }
     body {
-      min-width: 320px; margin: 0; overflow-x: hidden; color: var(--ink); background: var(--void);
+      min-width: 320px; min-height: 100svh; margin: 0; overflow-x: hidden; color: var(--ink);
+      background: radial-gradient(ellipse at 72% 47%, rgba(77, 32, 52, .13), transparent 37rem),
+        radial-gradient(ellipse at 44% 105%, rgba(86, 49, 34, .10), transparent 39rem), var(--ground);
       font-family: var(--sans); -webkit-font-smoothing: antialiased;
-      background-image: radial-gradient(ellipse at 78% 10%, rgba(54, 46, 114, .23), transparent 36rem),
-        radial-gradient(ellipse at 8% 42%, rgba(24, 84, 103, .12), transparent 38rem),
-        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
-      background-size: auto, auto, 54px 54px, 54px 54px;
-      background-position: center, center, center top, center top;
     }
     a { color: inherit; }
-    button, input { font: inherit; }
-    a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--lime); outline-offset: 4px; }
-    .skip-link { position: fixed; z-index: 20; top: 12px; left: 12px; padding: 10px 14px; transform: translateY(-160%); border-radius: 8px; background: var(--lime); color: #10140a; font-weight: 800; }
+    a:focus-visible { outline: 2px solid #f2b79f; outline-offset: 5px; border-radius: 2px; }
+    .skip-link { position: fixed; z-index: 10; top: 12px; left: 12px; padding: 11px 15px; transform: translateY(-160%); color: #171013; background: #f0c6b0; font-weight: 700; text-decoration: none; }
     .skip-link:focus { transform: translateY(0); }
-    #field { position: fixed; z-index: 0; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: .72; }
-    .wrap { position: relative; z-index: 1; width: min(var(--max), calc(100% - 64px)); margin-inline: auto; }
-    .mono { font-family: var(--mono); }
-    .topbar { min-height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--line); }
-    .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
-    .brand-symbol { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid rgba(203,255,101,.38); border-radius: 10px; background: rgba(203,255,101,.06); color: var(--lime); box-shadow: 0 0 24px rgba(203,255,101,.1); }
-    .brand-name { font-size: 12px; font-weight: 800; letter-spacing: .17em; }
-    .top-meta { display: flex; align-items: center; gap: 20px; color: var(--muted); font: 10px var(--mono); letter-spacing: .08em; }
-    .pulse { display: inline-flex; align-items: center; gap: 9px; color: var(--lime); }
-    .pulse::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 12px currentColor; }
-    .top-index { color: var(--faint); }
-    .hero { display: grid; grid-template-columns: minmax(0, .93fr) minmax(440px, 1.07fr); align-items: center; gap: clamp(32px, 5vw, 72px); padding: 76px 0 78px; }
-    .eyebrow { display: flex; align-items: center; gap: 11px; color: var(--cyan); font: 10px var(--mono); letter-spacing: .17em; text-transform: uppercase; }
-    .eyebrow::before { content: ""; width: 28px; height: 1px; background: currentColor; box-shadow: 0 0 8px currentColor; }
-    h1 { max-width: 640px; margin: 24px 0 22px; font-size: clamp(48px, 6.3vw, 78px); font-weight: 720; letter-spacing: -.075em; line-height: 1.08; }
-    h1 .gradient { color: transparent; background: linear-gradient(100deg, var(--lime) 4%, var(--cyan) 52%, var(--violet) 98%); background-clip: text; -webkit-background-clip: text; }
-    .hero-copy { max-width: 520px; margin: 0; color: #b3bdcd; font-size: 15px; line-height: 1.9; }
-    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; margin-top: 30px; }
-    .button-main { min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 0 18px; border: 1px solid var(--lime); border-radius: 7px; background: var(--lime); color: #11170a; font-size: 12px; font-weight: 850; text-decoration: none; transition: transform .2s ease, box-shadow .2s ease; }
-    .button-main:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(203,255,101,.22); }
-    .text-link { color: var(--muted); font-size: 12px; text-decoration-color: rgba(161,174,193,.4); text-underline-offset: 4px; }
-    .text-link:hover { color: var(--cyan); }
-    .hero-facts { display: flex; gap: 25px; margin-top: 35px; }
-    .fact { display: grid; gap: 4px; }
-    .fact strong { color: var(--ink); font: 700 19px var(--mono); letter-spacing: -.06em; }
-    .fact span { color: var(--faint); font: 9px var(--mono); letter-spacing: .08em; }
-    .fact + .fact { padding-left: 24px; border-left: 1px solid var(--line); }
-    .map-panel { position: relative; min-height: 438px; overflow: hidden; border: 1px solid rgba(148,174,208,.19); border-radius: 14px; background: linear-gradient(145deg, rgba(17,24,40,.94), rgba(9,14,24,.90)); box-shadow: 0 28px 80px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.035); isolation: isolate; }
-    .map-panel::before { content: ""; position: absolute; z-index: -1; inset: 0; background: radial-gradient(ellipse at 52% 48%, rgba(58,87,138,.22), transparent 52%), repeating-linear-gradient(0deg, transparent 0 35px, rgba(255,255,255,.018) 36px); pointer-events: none; }
-    .map-panel::after { content: ""; position: absolute; z-index: 0; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 50%, rgba(31,83,157,.2), transparent 35%), repeating-radial-gradient(circle at 50% 50%, transparent 0 34px, rgba(108,232,255,.045) 35px 36px, transparent 37px 60px); opacity: .62; }
-    .webgl-canvas { position: absolute; z-index: 1; inset: 0; display: block; width: 100%; height: 100%; opacity: .92; pointer-events: none; transition: opacity .25s ease; }
-    .map-panel[data-renderer="fallback"] .webgl-canvas, .map-panel[data-renderer="context-lost"] .webgl-canvas, .map-panel[data-renderer="static-mobile"] .webgl-canvas { opacity: 0; }
-    .map-head { position: absolute; z-index: 3; top: 18px; left: 21px; right: 21px; display: flex; justify-content: space-between; color: var(--faint); font: 9px var(--mono); letter-spacing: .1em; pointer-events: none; }
-    .map-count { color: var(--cyan); }
-    .map-svg { position: relative; z-index: 2; display: block; width: 100%; height: 100%; min-height: 438px; }
-    .render-readout { position: absolute; z-index: 3; right: 20px; bottom: 13px; left: 20px; display: flex; align-items: center; justify-content: flex-start; gap: clamp(9px, 2vw, 22px); color: #8796ad; font: 8px var(--mono); letter-spacing: .075em; pointer-events: none; }
-    .engine-chip { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
-    .engine-chip::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #647187; }
-    .engine-chip[data-state="live"]::before { background: var(--lime); box-shadow: 0 0 8px rgba(203,255,101,.65); }
-    .engine-chip[data-state="fallback"]::before { background: var(--cyan); }
-    .engine-chip b { color: #d1dbea; font-weight: 500; }
-    .orbit { fill: none; stroke: rgba(146,175,219,.15); stroke-width: 1; stroke-dasharray: 2 8; transform-box: fill-box; transform-origin: center; animation: orbit-turn 90s linear infinite; }
-    .orbit.orbit-2 { stroke: rgba(107,231,255,.11); stroke-dasharray: 1 9; animation-duration: 120s; animation-direction: reverse; }
-    .orbit.orbit-3 { stroke: rgba(168,156,255,.15); stroke-dasharray: none; }
-    .link-line { fill: none; stroke: rgba(108,232,255,.32); stroke-width: 1; stroke-dasharray: 4 7; animation: signal 7s linear infinite; transition: stroke .25s, opacity .25s, stroke-width .25s; }
-    .map-core-glow { fill: rgba(108,232,255,.06); stroke: rgba(108,232,255,.34); stroke-width: 1; }
-    .map-core { fill: #111b2b; stroke: var(--cyan); stroke-width: 1.2; }
-    .core-mark { fill: var(--cyan); font: 700 12px var(--mono); text-anchor: middle; dominant-baseline: central; }
-    .core-label { fill: #b8c8da; font: 8px var(--mono); letter-spacing: 1.6px; text-anchor: middle; }
-    .node-link { cursor: pointer; text-decoration: none; transition: opacity .2s ease; }
-    .node-box { fill: rgba(14,20,34,.96); stroke: rgba(172,194,225,.27); stroke-width: 1; transition: fill .2s, stroke .2s, filter .2s; }
-    .node-dot { stroke: #0b101b; stroke-width: 3; transition: r .2s, filter .2s; }
-    .node-title { fill: #eff4fb; font: 10px var(--sans); font-weight: 700; }
-    .node-type { fill: #8d9cb2; font: 7px var(--mono); letter-spacing: .7px; }
-    .node-link:hover .node-box, .node-link:focus-visible .node-box, .node-link.is-active .node-box { fill: #17243a; stroke: var(--node); filter: drop-shadow(0 0 8px color-mix(in srgb, var(--node), transparent 52%)); }
-    .node-link:hover .node-dot, .node-link:focus-visible .node-dot, .node-link.is-active .node-dot { r: 7; filter: drop-shadow(0 0 7px var(--node)); }
-    .node-link:focus-visible { outline: none; }
-    .map-panel[data-active] .node-link:not(.is-active) { opacity: .45; }
-    .map-panel[data-active] .link-line:not(.is-active) { opacity: .12; }
-    .link-line.is-active { stroke: var(--lime); stroke-width: 1.7; }
-    .mobile-map-note { display: none; }
-    .section { padding: 32px 0 72px; }
-    .section-top { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 23px; }
-    .section-kicker { margin: 0 0 9px; color: var(--pink); font: 9px var(--mono); letter-spacing: .16em; }
-    h2 { margin: 0; font-size: clamp(24px, 3vw, 31px); letter-spacing: -.05em; }
-    .section-intro { margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
-    .section-count { flex: 0 0 auto; color: var(--faint); font: 10px var(--mono); }
-    .section-count strong { color: var(--lime); font-size: 22px; }
-    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 16px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(12,17,29,.8); }
-    .filters { display: flex; flex-wrap: wrap; gap: 7px; }
-    .filter-btn { min-height: 32px; padding: 0 12px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; transition: background .18s, color .18s, border-color .18s; }
-    .filter-btn:hover { border-color: var(--line); color: var(--ink); }
-    .filter-btn[aria-pressed="true"] { border-color: rgba(203,255,101,.38); background: rgba(203,255,101,.09); color: var(--lime); }
-    .search-wrap { position: relative; width: min(280px, 38%); }
-    .search-wrap svg { position: absolute; top: 50%; left: 12px; width: 15px; transform: translateY(-50%); color: var(--faint); pointer-events: none; }
-    .search { width: 100%; min-height: 36px; padding: 0 43px 0 36px; border: 1px solid rgba(188,205,232,.16); border-radius: 6px; background: #090d17; color: var(--ink); font-size: 11px; }
-    .search::placeholder { color: #77849a; }
-    .shortcut { position: absolute; top: 50%; right: 10px; padding: 2px 5px; transform: translateY(-50%); border: 1px solid rgba(188,205,232,.18); border-radius: 4px; color: var(--faint); font: 9px var(--mono); pointer-events: none; }
-    .project-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
-    .project-card { --accent: var(--cyan); position: relative; display: flex; min-height: 208px; flex-direction: column; padding: 19px 20px 17px; overflow: hidden; border: 1px solid rgba(176,197,225,.16); border-radius: 10px; background: linear-gradient(140deg, rgba(18,25,41,.92), rgba(12,17,29,.96)); text-decoration: none; transition: transform .22s, border-color .22s, box-shadow .22s, opacity .2s; }
-    .project-card::before { content: ""; position: absolute; top: 0; left: 20px; width: 48px; height: 2px; background: var(--accent); box-shadow: 0 0 14px var(--accent); opacity: .8; }
-    .project-card::after { content: ""; position: absolute; top: -80px; right: -85px; width: 180px; height: 180px; border-radius: 50%; background: var(--accent); opacity: .045; filter: blur(38px); pointer-events: none; }
-    .project-card:hover, .project-card:focus-visible, .project-card.is-active { transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent), transparent 45%); box-shadow: 0 14px 40px rgba(0,0,0,.2), 0 0 24px color-mix(in srgb, var(--accent), transparent 90%); }
-    .project-card[hidden] { display: none; }
-    .card-head, .card-foot { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .card-head { color: var(--faint); font: 9px var(--mono); letter-spacing: .09em; }
-    .card-signal { display: inline-flex; align-items: center; gap: 7px; color: var(--accent); }
-    .card-signal::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
-    .card-title { position: relative; z-index: 1; margin: 22px 0 7px; font-size: 19px; font-weight: 680; letter-spacing: -.035em; }
-    .card-desc { position: relative; z-index: 1; max-width: 570px; margin: 0; color: #aab5c7; font-size: 12px; line-height: 1.75; }
-    .card-foot { margin-top: auto; padding-top: 18px; color: var(--accent); font-size: 10px; font-weight: 700; }
-    .card-foot .launch { width: 26px; height: 26px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--accent), transparent 62%); border-radius: 50%; font-size: 14px; transition: transform .2s, background .2s; }
-    .project-card:hover .launch, .project-card:focus-visible .launch { transform: translate(2px,-2px); background: color-mix(in srgb, var(--accent), transparent 88%); }
-    .results-note { min-height: 23px; margin: 12px 2px 0; color: var(--muted); font-size: 11px; }
-    .footnote { display: flex; align-items: start; gap: 11px; margin-top: 18px; padding: 14px 16px; border: 1px solid rgba(108,232,255,.18); border-radius: 8px; background: rgba(7,22,31,.52); color: #aebccc; font-size: 11px; line-height: 1.75; }
-    .footnote svg { flex: 0 0 auto; margin-top: 2px; color: var(--cyan); }
-    footer { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 19px 0 24px; border-top: 1px solid var(--line); color: var(--faint); font: 9px var(--mono); letter-spacing: .04em; }
-    footer a { color: #a3b3c9; text-decoration: none; }
-    footer a:hover { color: var(--cyan); }
-    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-    @keyframes signal { to { stroke-dashoffset: -44; } }
-    @keyframes orbit-turn { to { transform: rotate(360deg); } }
-    @media (max-width: 920px) {
-      .wrap { width: min(var(--max), calc(100% - 44px)); }
-      .hero { grid-template-columns: minmax(0, .9fr) minmax(350px, 1.1fr); gap: 28px; padding: 60px 0 58px; }
-      .map-panel, .map-svg { min-height: 390px; }
-      .node-title { font-size: 9px; }
+    .ambient { position: fixed; z-index: 0; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: .28; }
+    .frame { position: relative; z-index: 1; width: min(1500px, calc(100% - 88px)); margin-inline: auto; }
+    .masthead { height: 96px; display: flex; align-items: center; }
+    .wordmark { display: inline-flex; align-items: center; gap: 12px; color: #d5cbc4; text-decoration: none; }
+    .wordmark-mark { font: 500 21px/1 var(--serif); letter-spacing: -.08em; color: #e8b8a6; }
+    .wordmark-name { font: 500 10px/1 var(--mono); letter-spacing: .2em; }
+    main { min-height: calc(100svh - 96px); }
+    .exhibition {
+      min-height: min(820px, calc(100svh - 96px));
+      display: grid; grid-template-columns: minmax(255px, .72fr) minmax(0, 1.45fr);
+      align-items: center; gap: clamp(32px, 5vw, 84px); padding: 14px 0 48px;
+    }
+    .copy { grid-column: 1; grid-row: 1; position: relative; z-index: 3; padding: 28px 0 34px; }
+    h1 {
+      margin: 0; max-width: 440px; color: #f0e9e2; font: 500 clamp(45px, 5.1vw, 76px)/1.18 var(--serif);
+      letter-spacing: .025em; text-wrap: balance;
+    }
+    .index { margin: clamp(52px, 10vh, 112px) 0 0; padding: 0; list-style: none; }
+    .index li { border-top: 1px solid var(--line); }
+    .index li:last-child { border-bottom: 1px solid var(--line); }
+    .index-link {
+      min-height: 58px; display: grid; grid-template-columns: 32px 1fr 20px; align-items: center; gap: 11px;
+      color: var(--muted); text-decoration: none; transition: color .24s ease, padding .24s ease;
+    }
+    .index-number { color: var(--dim); font: 10px var(--mono); letter-spacing: .05em; transition: color .24s ease; }
+    .index-title { font-size: 13px; letter-spacing: .015em; }
+    .index-arrow { justify-self: end; color: #d79d89; font-size: 14px; opacity: 0; transform: translate(-5px, 4px); transition: opacity .24s ease, transform .24s ease; }
+    .index-link:hover, .index-link:focus-visible { color: #f3e6dc; padding-inline: 4px; }
+    .index-link:hover .index-number, .index-link:focus-visible .index-number { color: #d8a48e; }
+    .index-link:hover .index-arrow, .index-link:focus-visible .index-arrow { opacity: 1; transform: translate(0, 0); }
+    .artwork-stage {
+      grid-column: 2; grid-row: 1; position: relative; justify-self: center; width: min(100%, 850px);
+      height: min(77svh, 780px); min-height: 430px; overflow: hidden; isolation: isolate; border-radius: 50%;
+      background: radial-gradient(ellipse at 51% 49%, rgba(64, 35, 49, .22), rgba(32, 20, 30, .08) 34%, transparent 69%);
+    }
+    .artwork-stage::before {
+      content: ""; position: absolute; z-index: 0; inset: 7%; border-radius: 50%;
+      background: radial-gradient(ellipse at 48% 55%, rgba(184, 101, 90, .08), transparent 58%),
+        radial-gradient(ellipse at 57% 41%, rgba(109, 114, 157, .08), transparent 48%);
+      filter: blur(18px); pointer-events: none;
+    }
+    .sculpture, .art-fallback { position: absolute; z-index: 2; inset: 0; display: block; width: 100%; height: 100%; }
+    .sculpture { opacity: 0; transition: opacity .9s ease; }
+    .art-fallback { z-index: 1; overflow: visible; transform: scale(1.18); transition: opacity .8s ease; }
+    .artwork-stage[data-webgl="ready"] .sculpture { opacity: .98; }
+    .artwork-stage[data-webgl="ready"] .art-fallback { opacity: 0; visibility: hidden; }
+    .art-caption { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .endmark { width: 100%; padding: 0 0 max(25px, env(safe-area-inset-bottom)); color: #71686c; font: 9px var(--mono); letter-spacing: .16em; text-align: right; }
+    @media (min-width: 1501px) { .exhibition { gap: 84px; } }
+    @media (max-width: 900px) {
+      .frame { width: calc(100% - 56px); }
+      .exhibition { grid-template-columns: minmax(225px, .78fr) minmax(0, 1.2fr); gap: 25px; }
+      .artwork-stage { height: min(70svh, 660px); min-height: 390px; }
+      .index-link { min-height: 54px; }
     }
     @media (max-width: 700px) {
-      .wrap { width: min(100% - 36px, 540px); }
-      .topbar { min-height: 68px; }
-      .top-meta { gap: 10px; font-size: 8px; }
-      .top-index { display: none; }
-      .hero { display: flex; flex-direction: column; align-items: stretch; gap: 30px; padding: 52px 0 44px; }
-      h1 { margin: 20px 0 17px; font-size: clamp(45px, 12vw, 65px); }
-      .hero-copy { font-size: 14px; }
-      .hero-facts { margin-top: 28px; }
-      .map-panel { display: none; }
-      .mobile-map-note { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid rgba(108,232,255,.2); border-radius: 8px; background: linear-gradient(110deg, rgba(108,232,255,.08), rgba(168,156,255,.05)); color: #aab9cb; font: 9px var(--mono); }
-      .mobile-map-note strong { color: var(--cyan); font-weight: 600; }
-      .section { padding: 24px 0 50px; }
-      .section-top { align-items: end; }
-      .toolbar { align-items: stretch; flex-direction: column; }
-      .filters { gap: 5px; }
-      .filter-btn { padding-inline: 11px; }
-      .search-wrap { width: 100%; }
-      .project-grid { grid-template-columns: 1fr; gap: 10px; }
-      .project-card { min-height: 188px; padding: 17px 17px 15px; }
-      .card-title { margin-top: 18px; }
-      footer { align-items: flex-start; flex-direction: column; padding-bottom: 20px; }
+      .frame { width: calc(100% - 40px); }
+      .masthead { height: 72px; }
+      .wordmark { gap: 10px; }
+      .wordmark-mark { font-size: 19px; }
+      .wordmark-name { font-size: 9px; }
+      main { min-height: auto; }
+      .exhibition { min-height: auto; display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 0 0 43px; }
+      .artwork-stage { order: 0; align-self: center; width: min(100%, 540px); height: min(112vw, 53svh); min-height: 290px; max-height: 470px; margin: 0 0 2px; }
+      .copy { order: 1; padding: 0 0 12px; }
+      h1 { font-size: clamp(42px, 11vw, 58px); line-height: 1.2; }
+      .index { margin-top: 34px; }
+      .index-link { min-height: 62px; grid-template-columns: 34px 1fr 22px; gap: 10px; }
+      .index-title { font-size: 14px; }
+      .index-arrow { opacity: .72; transform: none; }
+      .endmark { padding-top: 0; text-align: left; }
     }
-    @media (max-width: 390px) {
-      .brand-name { font-size: 10px; letter-spacing: .12em; }
-      .brand { gap: 8px; }
-      .brand-symbol { width: 30px; height: 30px; }
-      .top-meta { font-size: 7px; }
-      .hero-actions { gap: 12px; }
-      .button-main { padding-inline: 14px; }
-      .fact + .fact { padding-left: 17px; }
-      .section-count { font-size: 8px; }
+    @media (max-width: 360px) {
+      .frame { width: calc(100% - 32px); }
+      .artwork-stage { min-height: 274px; }
+      .index-link { min-height: 60px; }
+      .index-title { font-size: 13px; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
     }
   </style>
 </head>
 <body>
-  <a class="skip-link" href="#main">跳到主要内容</a>
-  <canvas id="field" aria-hidden="true"></canvas>
-  <header class="wrap topbar">
-    <a class="brand" href="/" aria-label="Kuntechnology 数字现场首页">
-      <span class="brand-symbol" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2.5 21.5 8v8L12 21.5 2.5 16V8L12 2.5Z" stroke="currentColor" stroke-width="1.3"/><path d="m9 8 4 4-4 4m4-4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      <span class="brand-name">KUNTECHNOLOGY</span>
+  <a class="skip-link" href="#main">跳到作品索引</a>
+  <canvas class="ambient" id="ambient" aria-hidden="true"></canvas>
+  <header class="frame masthead">
+    <a class="wordmark" href="/" aria-label="Kuntechnology 首页">
+      <span class="wordmark-mark" aria-hidden="true">K.</span>
+      <span class="wordmark-name">KUNTECHNOLOGY</span>
     </a>
-    <div class="top-meta"><span class="pulse">STATIC / 04 ROUTES</span><span class="top-index">DIGITAL FIELD NOTES&nbsp; · &nbsp;01</span></div>
   </header>
-
-  <main id="main" class="wrap">
-    <section class="hero" aria-labelledby="page-title">
-      <div class="hero-intro">
-        <div class="eyebrow">Digital portfolio <span aria-hidden="true">/</span> 项目星图</div>
-        <h1 id="page-title">让好奇心<br>进入<span class="gradient">数字现场。</span></h1>
-        <p class="hero-copy">这里收集着设计实验、轻量工具与技术可视化。沿着信号连接，找到下一段值得探索的内容。</p>
-        <div class="hero-actions">
-          <a class="button-main" href="#projects">扫描项目星图 <span aria-hidden="true">↓</span></a>
-          <a class="text-link" href="https://github.com/kuntechnology/kuntechnology.github.io" target="_blank" rel="noopener noreferrer">查看首页源码 ↗<span class="sr-only">（新标签页打开）</span></a>
-        </div>
-        <div class="hero-facts" aria-label="项目统计">
-          <div class="fact"><strong>04</strong><span>公开访问路径</span></div>
-          <div class="fact"><strong>04</strong><span>不同项目内容</span></div>
-          <div class="fact"><strong>00</strong><span>外部网络依赖</span></div>
-        </div>
-      </div>
-
-      <div class="map-panel" id="project-map" aria-label="项目关系星图" data-renderer="detecting">
-        <canvas id="energy-field" class="webgl-canvas" aria-hidden="true"></canvas>
-        <div class="map-head"><span>FIELD MAP&nbsp; / &nbsp;PROJECT ROUTES</span><span class="map-count">04 NODES</span></div>
-        <div class="render-readout" aria-label="实时视觉引擎状态">
-          <span class="engine-chip" id="webgl-engine" data-state="static"><span>WEBGL</span><b id="webgl-value">CHECKING</b></span>
-          <span class="engine-chip" id="gsap-engine" data-state="static"><span>GSAP</span><b id="gsap-value">CHECKING</b></span>
-          <span class="engine-chip" id="canvas-engine" data-state="static"><span>CANVAS</span><b id="canvas-value">CHECKING</b></span>
-        </div>
-        <svg class="map-svg" viewBox="0 0 620 438" role="group" aria-label="可交互项目星图；选择节点可打开对应项目">
-          <ellipse class="orbit orbit-1" cx="310" cy="218" rx="246" ry="151"/>
-          <ellipse class="orbit orbit-2" cx="310" cy="218" rx="202" ry="114" transform="rotate(-27 310 218)"/>
-          <ellipse class="orbit orbit-3" cx="310" cy="218" rx="155" ry="68" transform="rotate(23 310 218)"/>
-          <path class="link-line" data-project="design" d="M310 218 139 112"/>
-          <path class="link-line" data-project="utility" d="M310 218 480 112"/>
-          <path class="link-line" data-project="defense" d="M310 218 135 323"/>
-          <path class="link-line" data-project="learning" d="M310 218 487 322"/>
-          <circle class="map-core-glow" cx="310" cy="218" r="42"/>
-          <circle class="map-core" cx="310" cy="218" r="28"/>
-          <text class="core-mark" x="310" y="217">K/01</text>
-          <text class="core-label" x="310" y="260">INDEX NODE</text>
-          <a class="node-link" data-project="design" style="--node:#a89cff" href="https://kuntechnology.github.io/ui-style-gallery/" target="_blank" rel="noopener noreferrer" aria-label="打开 UI 设计风格集锦，新标签页">
-            <title>打开 UI 设计风格集锦（新标签页）</title><circle class="node-dot" cx="139" cy="112" r="5" fill="#a89cff"/><rect class="node-box" x="39" y="67" width="137" height="37" rx="6"/><text class="node-title" x="51" y="83">UI 设计风格集锦</text><text class="node-type" x="51" y="96">DESIGN / 44 STYLES</text>
-          </a>
-          <a class="node-link" data-project="utility" style="--node:#ff77ba" href="https://kuntechnology.github.io/iv-infusion-helper/" target="_blank" rel="noopener noreferrer" aria-label="打开输液提醒小助手，新标签页">
-            <title>打开输液提醒小助手（新标签页）</title><circle class="node-dot" cx="480" cy="112" r="5" fill="#ff77ba"/><rect class="node-box" x="440" y="67" width="151" height="37" rx="6"/><text class="node-title" x="452" y="83">输液提醒小助手</text><text class="node-type" x="452" y="96">UTILITY / TIMER</text>
-          </a>
-          <a class="node-link" data-project="defense" style="--node:#6ce8ff" href="https://kuntechnology.github.io/Das-security/" target="_blank" rel="noopener noreferrer" aria-label="打开安恒信息安全服务方案，新标签页">
-            <title>打开安恒信息安全服务方案（新标签页）</title><circle class="node-dot" cx="135" cy="323" r="5" fill="#6ce8ff"/><rect class="node-box" x="36" y="333" width="170" height="37" rx="6"/><text class="node-title" x="48" y="349">安恒信息安全方案</text><text class="node-type" x="48" y="362">SECURITY / SERVICE</text>
-          </a>
-          <a class="node-link" data-project="learning" style="--node:#cbff65" href="https://kuntechnology.github.io/sftp-visualization-guide/" target="_blank" rel="noopener noreferrer" aria-label="打开 SFTP 安全传输可视化指南，新标签页">
-            <title>打开 SFTP 安全传输可视化指南（新标签页）</title><circle class="node-dot" cx="487" cy="322" r="5" fill="#cbff65"/><rect class="node-box" x="414" y="333" width="177" height="37" rx="6"/><text class="node-title" x="426" y="349">SFTP 可视化指南</text><text class="node-type" x="426" y="362">LEARN / INTERACTIVE</text>
-          </a>
+  <main id="main" class="frame">
+    <section class="exhibition" aria-labelledby="page-title">
+      <div class="artwork-stage" id="artwork" data-webgl="fallback" aria-hidden="true">
+        <canvas class="sculpture" id="sculpture"></canvas>
+        <svg class="art-fallback" viewBox="0 0 900 900" role="presentation" focusable="false">
+          <defs>
+            <radialGradient id="body" cx="42%" cy="34%" r="70%">
+              <stop offset="0" stop-color="#f5c9ae" stop-opacity=".74"/>
+              <stop offset=".24" stop-color="#ca7c78" stop-opacity=".64"/>
+              <stop offset=".56" stop-color="#6b405b" stop-opacity=".68"/>
+              <stop offset="1" stop-color="#171624" stop-opacity=".96"/>
+            </radialGradient>
+            <linearGradient id="silk" x1=".14" y1=".06" x2=".91" y2=".94">
+              <stop stop-color="#ffddbd" stop-opacity=".9"/><stop offset=".36" stop-color="#da8d83" stop-opacity=".72"/>
+              <stop offset=".7" stop-color="#a58caf" stop-opacity=".8"/><stop offset="1" stop-color="#92d3cf" stop-opacity=".8"/>
+            </linearGradient>
+            <linearGradient id="silk2" x1=".9" y1=".12" x2=".1" y2=".91">
+              <stop stop-color="#a8d9d1" stop-opacity=".82"/><stop offset=".43" stop-color="#9d83a5" stop-opacity=".72"/>
+              <stop offset=".78" stop-color="#e6a084" stop-opacity=".88"/><stop offset="1" stop-color="#f5d6bf" stop-opacity=".76"/>
+            </linearGradient>
+            <filter id="soft-glow" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="24"/></filter>
+          </defs>
+          <ellipse cx="454" cy="469" rx="281" ry="275" fill="#b05f78" opacity=".13" filter="url(#soft-glow)"/>
+          <path d="M450 176 C600 168 702 286 680 426 C658 570 526 723 431 695 C335 667 238 529 256 394 C275 259 343 184 450 176Z" fill="url(#body)" stroke="url(#silk)" stroke-opacity=".46" stroke-width="2"/>
+          <g fill="none" stroke-linecap="round">
+            <path d="M286 475 C293 311 385 194 480 201 C570 208 638 336 611 469 C585 602 463 681 374 625 C292 574 287 438 354 344 C417 256 559 251 632 345 C695 426 642 554 557 612 C468 674 342 634 296 537 C251 443 312 317 418 283 C522 249 637 319 660 416 C683 510 580 614 478 620 C373 627 290 541 300 437" stroke="url(#silk)" stroke-width="8" opacity=".87"/>
+            <path d="M332 250 C468 288 597 350 625 447 C652 541 550 644 451 638 C350 632 265 527 286 420 C307 313 436 237 537 267 C638 297 693 420 648 514 C601 610 468 654 377 598 C286 542 269 410 322 330 C375 250 505 231 588 292 C671 353 675 480 607 555" stroke="url(#silk2)" stroke-width="3.4" opacity=".72"/>
+            <path d="M369 208 C291 324 296 475 375 572 C455 671 592 674 652 574 C712 474 662 329 570 267 C478 205 353 246 310 353 C267 460 330 584 431 615 C532 645 644 570 655 467 C667 364 580 278 481 278 C382 278 305 366 314 456" stroke="#f4c5aa" stroke-width="1.6" opacity=".66"/>
+            <path d="M289 444 C354 519 438 549 525 520 C612 491 665 412 648 332 M305 496 C383 568 484 581 565 532 C646 484 677 393 644 319 M319 547 C403 609 509 606 586 547 C663 489 682 393 640 319" stroke="#f1baa5" stroke-width="1.15" opacity=".34"/>
+            <path d="M370 353 C421 310 499 310 544 354 C591 400 586 474 536 516 C484 559 410 552 370 504 C330 455 337 386 383 350 C429 313 494 325 528 369 C563 414 550 471 509 500 C468 529 418 514 393 479 C368 444 380 402 412 384 C444 366 484 379 497 408 C510 437 493 463 469 470" stroke="#f9d7c0" stroke-width="1.4" opacity=".72"/>
+          </g>
+          <ellipse cx="441" cy="411" rx="112" ry="171" fill="none" stroke="#e4a28f" stroke-opacity=".18" stroke-width="17" transform="rotate(37 441 411)"/>
         </svg>
+        <span class="art-caption">一件由光线与流动曲面构成的虹彩生成式雕塑</span>
       </div>
-      <div class="mobile-map-note"><span><strong>星图已折叠为清晰纵向目录</strong></span><span aria-hidden="true">↓ 04 ROUTES</span></div>
+      <div class="copy">
+        <h1 id="page-title">光在生长。</h1>
+        <nav aria-label="作品索引">
+          <ol class="index">
+            <li><a class="index-link" href="https://kuntechnology.github.io/ui-style-gallery/" target="_blank" rel="noopener noreferrer"><span class="index-number">01</span><span class="index-title">UI 设计风格集锦</span><span class="index-arrow" aria-hidden="true">↗</span><span class="art-caption">（新标签页打开）</span></a></li>
+            <li><a class="index-link" href="https://kuntechnology.github.io/iv-infusion-helper/" target="_blank" rel="noopener noreferrer"><span class="index-number">02</span><span class="index-title">输液提醒小助手</span><span class="index-arrow" aria-hidden="true">↗</span><span class="art-caption">（新标签页打开）</span></a></li>
+            <li><a class="index-link" href="https://kuntechnology.github.io/Das-security/" target="_blank" rel="noopener noreferrer"><span class="index-number">03</span><span class="index-title">安恒安全方案</span><span class="index-arrow" aria-hidden="true">↗</span><span class="art-caption">（新标签页打开）</span></a></li>
+            <li><a class="index-link" href="https://kuntechnology.github.io/sftp-visualization-guide/" target="_blank" rel="noopener noreferrer"><span class="index-number">04</span><span class="index-title">SFTP 交互指南</span><span class="index-arrow" aria-hidden="true">↗</span><span class="art-caption">（新标签页打开）</span></a></li>
+          </ol>
+        </nav>
+      </div>
     </section>
-
-    <section id="projects" class="section" aria-labelledby="projects-heading">
-      <div class="section-top">
-        <div><p class="section-kicker">01 — 04&nbsp; / &nbsp;SELECT A SIGNAL</p><h2 id="projects-heading">选择一条路径</h2><p class="section-intro">每个节点通向一个公开项目。悬停或聚焦卡片，可在星图中追踪对应信号。</p></div>
-        <div class="section-count"><strong id="visible-count">04</strong> <span>/ 04 PATHS</span></div>
-      </div>
-      <div class="toolbar" aria-label="项目筛选工具">
-        <div class="filters" role="group" aria-label="按类型筛选项目">
-          <button class="filter-btn" type="button" data-filter="all" aria-pressed="true">全部 <span>(4)</span></button>
-          <button class="filter-btn" type="button" data-filter="design" aria-pressed="false">设计 <span>(1)</span></button>
-          <button class="filter-btn" type="button" data-filter="tools" aria-pressed="false">工具 <span>(1)</span></button>
-          <button class="filter-btn" type="button" data-filter="security" aria-pressed="false">安全 / 指南 <span>(2)</span></button>
-        </div>
-        <label class="search-wrap"><span class="sr-only">搜索项目名称或说明</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="m12.5 12.5 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><input id="project-search" class="search" type="search" placeholder="搜索项目…" autocomplete="off"><span class="shortcut" aria-hidden="true">/</span></label>
-      </div>
-      <div id="project-grid" class="project-grid">
-        <a class="project-card" data-project="design" data-category="design" href="https://kuntechnology.github.io/ui-style-gallery/" target="_blank" rel="noopener noreferrer" style="--accent:#a89cff" aria-label="打开 UI 设计风格集锦，新标签页">
-          <div class="card-head"><span>NODE / 01</span><span class="card-signal">DESIGN SIGNAL</span></div><h3 class="card-title">UI 设计风格集锦</h3><p class="card-desc">浏览 44 种界面风格、设计 tokens 与迷你示例，把视觉灵感转化为可复用的设计语言。</p><div class="card-foot"><span>打开风格库 <span class="sr-only">（新标签页打开）</span></span><span class="launch" aria-hidden="true">↗</span></div>
-        </a>
-        <a class="project-card" data-project="utility" data-category="tools" href="https://kuntechnology.github.io/iv-infusion-helper/" target="_blank" rel="noopener noreferrer" style="--accent:#ff77ba" aria-label="打开输液提醒小助手，新标签页">
-          <div class="card-head"><span>NODE / 02</span><span class="card-signal">UTILITY SIGNAL</span></div><h3 class="card-title">输液提醒小助手</h3><p class="card-desc">输入容量与实际滴速，估算时长和结束时间，并可添加日历提醒；计算结果仅供参考。</p><div class="card-foot"><span>打开提醒助手 <span class="sr-only">（新标签页打开）</span></span><span class="launch" aria-hidden="true">↗</span></div>
-        </a>
-        <a class="project-card" data-project="defense" data-category="security" href="https://kuntechnology.github.io/Das-security/" target="_blank" rel="noopener noreferrer" style="--accent:#6ce8ff" aria-label="打开安恒信息安全服务方案，新标签页">
-          <div class="card-head"><span>NODE / 03</span><span class="card-signal">SERVICE SIGNAL</span></div><h3 class="card-title">安恒信息安全服务方案</h3><p class="card-desc">金融行业安全服务展示，介绍合规检测、自动化测试与相关服务案例。</p><div class="card-foot"><span>查看安全方案 <span class="sr-only">（新标签页打开）</span></span><span class="launch" aria-hidden="true">↗</span></div>
-        </a>
-        <a class="project-card" data-project="learning" data-category="security" href="https://kuntechnology.github.io/sftp-visualization-guide/" target="_blank" rel="noopener noreferrer" style="--accent:#cbff65" aria-label="打开 SFTP 安全传输可视化指南，新标签页">
-          <div class="card-head"><span>NODE / 04</span><span class="card-signal">LEARNING SIGNAL</span></div><h3 class="card-title">SFTP 安全传输可视化指南</h3><p class="card-desc">通过交互图示了解 SFTP、SSH 加密隧道与协议解析限制。</p><div class="card-foot"><span>开始交互学习 <span class="sr-only">（新标签页打开）</span></span><span class="launch" aria-hidden="true">↗</span></div>
-        </a>
-      </div>
-      <p id="results-note" class="results-note" role="status" aria-live="polite">显示全部 4 条项目路径。</p>
-      <p class="footnote"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.4"/><path d="M10 9v4M10 6.2h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>这是纯静态项目索引，收录四个内容不同的公开入口；链接指向各自独立的 GitHub Pages 页面。本首页不承载后台服务，也不替代项目页面中的说明与限制。</span></p>
-    </section>
+    <footer class="endmark">© KUNTECHNOLOGY</footer>
   </main>
-
-  <footer class="wrap"><span>© KUNTECHNOLOGY&nbsp; / &nbsp;DIGITAL FIELD NOTES</span><a href="https://github.com/kuntechnology/kuntechnology.github.io" target="_blank" rel="noopener noreferrer">SOURCE CODE ↗</a></footer>
-  <script>
-    (() => {
-      const cards = [...document.querySelectorAll('.project-card')];
-      const nodes = [...document.querySelectorAll('.node-link')];
-      const lines = [...document.querySelectorAll('.link-line')];
-      const map = document.getElementById('project-map');
-      const search = document.getElementById('project-search');
-      const counter = document.getElementById('visible-count');
-      const note = document.getElementById('results-note');
-      const filters = [...document.querySelectorAll('.filter-btn')];
-      let activeFilter = 'all';
-
-      function setActive(project) {
-        if (project) map.dataset.active = project; else delete map.dataset.active;
-        nodes.forEach(node => node.classList.toggle('is-active', !!project && node.dataset.project === project));
-        lines.forEach(line => line.classList.toggle('is-active', !!project && line.dataset.project === project));
-        cards.forEach(card => card.classList.toggle('is-active', !!project && card.dataset.project === project));
-      }
-      cards.forEach(card => {
-        card.addEventListener('pointerenter', () => setActive(card.dataset.project));
-        card.addEventListener('pointerleave', () => setActive(document.activeElement?.dataset?.project || ''));
-        card.addEventListener('focus', () => setActive(card.dataset.project));
-        card.addEventListener('blur', () => setActive(''));
-      });
-      nodes.forEach(node => {
-        node.addEventListener('pointerenter', () => setActive(node.dataset.project));
-        node.addEventListener('pointerleave', () => setActive(document.activeElement?.dataset?.project || ''));
-        node.addEventListener('focus', () => setActive(node.dataset.project));
-        node.addEventListener('blur', () => setActive(''));
-      });
-      function applyFilters() {
-        const query = search.value.trim().toLocaleLowerCase('zh-CN');
-        let shown = 0;
-        cards.forEach(card => {
-          const matchesType = activeFilter === 'all' || card.dataset.category === activeFilter;
-          const matchesText = !query || card.textContent.toLocaleLowerCase('zh-CN').includes(query);
-          const visible = matchesType && matchesText;
-          card.hidden = !visible;
-          if (visible) shown++;
-        });
-        counter.textContent = String(shown).padStart(2, '0');
-        note.textContent = shown ? `找到 ${shown} 条项目路径。` : '没有匹配的项目；试试更短的关键词或切换分类。';
-      }
-      filters.forEach(button => button.addEventListener('click', () => {
-        activeFilter = button.dataset.filter;
-        filters.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
-        applyFilters();
-      }));
-      search.addEventListener('input', applyFilters);
-      document.addEventListener('keydown', event => {
-        if (event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && !['INPUT','TEXTAREA'].includes(document.activeElement?.tagName) && !document.activeElement?.isContentEditable) {
-          event.preventDefault(); search.focus();
-        }
-        if (event.key === 'Escape' && document.activeElement === search) {
-          search.value = ''; applyFilters(); search.blur();
-        }
-      });
-
-      const canvas = document.getElementById('field');
-      const ctx = canvas.getContext('2d', { alpha: true });
-      const diagnostics = window.__kuntechFx || (window.__kuntechFx = {});
-      diagnostics.canvas = { state: ctx ? 'ready' : 'fallback', frames: 0, paused: true };
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-      let width = 0, height = 0, dpr = 1, points = [], frame = 0, lastPaint = 0, active = false;
-      let seed = 971;
-      const random = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
-      function resize() {
-        width = window.innerWidth; height = window.innerHeight;
-        dpr = Math.min(window.devicePixelRatio || 1, width < 700 ? 1 : 1.25);
-        canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
-        canvas.style.width = `${width}px`; canvas.style.height = `${height}px`;
-        const amount = Math.max(16, Math.min(width < 700 ? 20 : 36, Math.floor(width * height / 28000)));
-        seed = 971; points = Array.from({length: amount}, () => ({x: random()*width, y: random()*height, vx: (random()-.5)*.16, vy: (random()-.5)*.16, r: .6+random()*1.15}));
-        paint(0, false);
-      }
-      function paint(time, move) {
-        if (!ctx) return;
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, width, height);
-        if (move) diagnostics.canvas.frames++;
-        for (let i=0; i<points.length; i++) {
-          const p = points[i];
-          if (move) { p.x += p.vx; p.y += p.vy; if (p.x < -8 || p.x > width+8) p.vx *= -1; if (p.y < -8 || p.y > height+8) p.vy *= -1; }
-          for (let j=i+1; j<points.length; j++) {
-            const q=points[j], dx=p.x-q.x, dy=p.y-q.y, distance=Math.hypot(dx,dy);
-            if (distance < 112) { ctx.strokeStyle=`rgba(108,232,255,${(1-distance/112)*.11})`; ctx.lineWidth=.7; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); }
-          }
-          ctx.fillStyle='rgba(170,220,255,.48)'; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
-        }
-      }
-      function tick(time) {
-        if (!active || document.hidden || reduceMotion.matches) { frame=0; return; }
-        if (time-lastPaint >= 34) { paint(time,true); lastPaint=time; }
-        frame=requestAnimationFrame(tick);
-      }
-      function start() { active=Boolean(ctx); diagnostics.canvas.paused=!ctx || reduceMotion.matches || document.hidden; if (active && !reduceMotion.matches && !document.hidden && !frame) { diagnostics.canvas.paused=false; frame=requestAnimationFrame(tick); } }
-      function stop() { active=false; if (frame) cancelAnimationFrame(frame); frame=0; diagnostics.canvas.paused=true; }
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) { if (frame) cancelAnimationFrame(frame); frame=0; diagnostics.canvas.paused=true; }
-        else if (active && !reduceMotion.matches && !frame) { diagnostics.canvas.paused=false; frame=requestAnimationFrame(tick); }
-      });
-      reduceMotion.addEventListener?.('change', () => { if (reduceMotion.matches) { if (frame) cancelAnimationFrame(frame); frame=0; diagnostics.canvas.paused=true; paint(0,false); } else if (active && !document.hidden && !frame) { diagnostics.canvas.paused=false; frame=requestAnimationFrame(tick); } });
-      window.addEventListener('resize', resize, {passive:true});
-      resize(); start();
-    })();
-  </script>
-  <script defer src="./assets/gsap-3.15.0.min.js"></script>
-  <script defer src="./assets/visual-effects.js"></script>
+  <script defer src="/assets/gsap-3.15.0.min.js"></script>
+  <script defer src="/assets/visual-effects.js"></script>
 </body>
 </html>
