@@ -63,7 +63,7 @@
       float scan=1.0-smoothstep(0.0,.013,abs(sweep-.5));
       color+=vec3(.13,.61,.98)*scan*.19;
       float rim=pow(1.0-max(n.z,0.0),2.8);
-      color+=vec3(.018,.15,.31)*rim*.24;
+      color+=vec3(.012,.055,.11)*rim*.15;
       float glint=pow(max(dot(n,normalize(vec3(-.52,.58,.63))),0.0),28.0);
       color+=vec3(.19,.54,.84)*glint*.18;
       gl_FragColor=vec4(color,1.0);
@@ -75,8 +75,8 @@
     void main(){
       vec3 n=normalize(v_normal);
       float rim=pow(1.0-abs(n.z),2.55);
-      float alpha=.035+rim*.43;
-      gl_FragColor=vec4(.15,.62,1.0,alpha);
+      float alpha=.006+rim*.04;
+      gl_FragColor=vec4(.25,.45,.60,alpha);
     }
   `;
 
@@ -238,8 +238,11 @@
       const random=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
       const count=Math.min(180,Math.max(72,Math.round(innerWidth*innerHeight/6800)));
       dust=Array.from({length:count},()=>{
-        const depth=.08+Math.pow(random(),.78)*.92;
-        return {x:random(),y:random(),depth,r:.23+Math.pow(depth,1.75)*1.45,alpha:.12+depth*.39,phase:random()*6.28,speed:.3+depth*1.6};
+        const band=random(),depth=band<.66?.04+random()*.34:band<.92?.42+random()*.33:.78+random()*.22;
+        const r=depth<.4?.22+random()*.34:depth<.75?.48+random()*.58:1.08+random()*1.12;
+        const alpha=depth<.4?.12+random()*.14:depth<.75?.20+random()*.19:.32+random()*.27;
+        const twinkle=depth<.75?random()<.28:random()<.08;
+        return {x:random(),y:random(),depth,r,alpha,phase:random()*6.28,speed:.24+depth*1.85,twinkle,twinkleSpeed:.00028+random()*.00032,twinkleAmount:.14+random()*.2};
       });
       fx.starCount=dust.length;
     }
@@ -305,7 +308,7 @@
         const drift=reduced?0:now*.001*point.speed;
         const x=((point.x*w+pointer.x*point.depth*12)%w+w)%w;
         const y=((point.y*h+drift)%h+h)%h;
-        const shimmer=reduced?.82:.76+.24*Math.sin(now*.0012+point.phase);
+        const shimmer=reduced?.82:(point.twinkle?1-point.twinkleAmount*(.5+.5*Math.sin(now*point.twinkleSpeed+point.phase)):1);
         ctx.beginPath(); ctx.arc(x,y,point.r,0,Math.PI*2);
         ctx.fillStyle=`rgba(151,207,244,${point.alpha*shimmer})`; ctx.fill();
       }
