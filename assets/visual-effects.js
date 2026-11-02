@@ -9,14 +9,15 @@
   const fx = window.__kuntechFx = {
     webgl: 'fallback', texture: 'pending', canvas: 'fallback', gsap: 'static',
     reducedMotion: motion.matches, paused: true, frames: 0, fallbackReason: '',
-    starCount: 0, ambientFrames: 0, ambientDpr: 1, cometsSpawned: 0, cometActiveCount: 0, pointerActive: false
+    starCount: 0, ambientFrames: 0, ambientDpr: 1, cometsSpawned: 0, cometActiveCount: 0, pointerActive: false, manuallyPaused: false
   };
   const gsap = window.gsap || null;
   let gl = null, earthProgram = null, airProgram = null, vertexBuffer = null, indexBuffer = null, texture = null;
   let indexCount = 0, width = 0, height = 0, raf = 0, ambientRaf = 0, lastFrame = 0;
-  let visible = true, ambientVisible = true, ambientCtx = null, dust = [], comets = [], entrance = null;
+  let visible = true, ambientVisible = true, ambientCtx = null, dust = [], comets = [], entrance = null, manuallyPaused = false, sceneSeconds = 0;
   let pointerTarget = {x:0,y:0}, pointer = {x:0,y:0}, pointerMedia = window.matchMedia('(hover: hover) and (pointer: fine)');
   let pointerEnabled = pointerMedia.matches && !motion.matches, ambientLastFrame = 0, nextCometAt = 0;
+  const MAX_BACKGROUND_COMETS = 4;
 
   const vertexSource = `
     attribute vec3 a_position;
@@ -152,6 +153,7 @@
   }
   function draw(seconds){
     if(!gl||!earthProgram||!airProgram||!texture||!width||!height) return;
+    sceneSeconds=seconds;
     gl.viewport(0,0,width,height);
     gl.clearColor(0,0,0,0);
     gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
@@ -178,7 +180,7 @@
     gl.viewport(0,0,w,h);
     draw(0);
   }
-  function canAnimate(){return !motion.matches&&!document.hidden&&visible;}
+  function canAnimate(){return !motion.matches&&!manuallyPaused&&!document.hidden&&visible;}
   function frame(now){
     if(!canAnimate()){raf=0;return;}
     if(now-lastFrame>=1000/30){draw(now*.001);lastFrame=now;}
@@ -257,7 +259,7 @@
       drawAmbient(0);
     }
     function updateCamera(){
-      if(!pointerEnabled||motion.matches){pointer.x=0;pointer.y=0;}
+      if(!pointerEnabled||motion.matches||manuallyPaused){pointer.x=0;pointer.y=0;}
       else{
         pointer.x+=(pointerTarget.x-pointer.x)*.075;
         pointer.y+=(pointerTarget.y-pointer.y)*.075;
@@ -266,11 +268,11 @@
         stage.style.setProperty('--camera-x',`${(pointer.x*8).toFixed(2)}px`);
         stage.style.setProperty('--camera-y',`${(pointer.y*6).toFixed(2)}px`);
       }
-      fx.pointerActive=pointerEnabled&&!motion.matches;
+      fx.pointerActive=pointerEnabled&&!motion.matches&&!manuallyPaused;
     }
     function drawComets(now,ctx,w,h){
       if(now>=nextCometAt){
-        if(Math.random()<.62){
+        if(Math.random()<.62&&comets.length<MAX_BACKGROUND_COMETS){
           const depth=.18+Math.random()*.78, angle=(.14+Math.random()*.42)*(Math.random()<.5?-1:1);
           const speed=190+depth*260;
           comets.push({x:Math.random()*w,y:Math.random()*h*.82,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,depth,length:15+depth*39,life:650+Math.random()*850,start:now});
@@ -296,7 +298,7 @@
     }
     function drawAmbient(now){
       if(!ambientCtx) return;
-      const ctx=ambientCtx,w=innerWidth,h=innerHeight,reduced=motion.matches;
+      const ctx=ambientCtx,w=innerWidth,h=innerHeight,reduced=motion.matches||manuallyPaused;
       updateCamera();
       ctx.clearRect(0,0,w,h);
       if(pointerEnabled&&!reduced){
@@ -317,14 +319,14 @@
     }
     function paint(now){
       ambientRaf=0;
-      if(!ambientVisible||document.hidden||motion.matches) return;
+      if(!ambientVisible||document.hidden||motion.matches||manuallyPaused) return;
       if(now-ambientLastFrame<1000/30){ambientRaf=requestAnimationFrame(paint);return;}
       ambientLastFrame=now;
       drawAmbient(now);
       ambientRaf=requestAnimationFrame(paint);
     }
     function start(){
-      if(motion.matches||document.hidden||!ambientVisible||ambientRaf) return;
+      if(motion.matches||manuallyPaused||document.hidden||!ambientVisible||ambientRaf) return;
       if(!nextCometAt||nextCometAt<performance.now()) nextCometAt=performance.now()+14000+Math.random()*26000;
       ambientRaf=requestAnimationFrame(paint);
     }
@@ -349,7 +351,7 @@
         link.style.setProperty('--link-glow-y','50%');
       },{passive:true});
     });
-    const pointerChange=event=>{pointerEnabled=event.matches&&!motion.matches;if(!pointerEnabled) pointerTarget={x:0,y:0};};
+    const pointerChange=event=>{pointerEnabled=event.matches&&!motion.matches&&!manuallyPaused;if(!pointerEnabled) pointerTarget={x:0,y:0};};
     if(pointerMedia.addEventListener) pointerMedia.addEventListener('change',pointerChange); else pointerMedia.addListener?.(pointerChange);
     window.__kuntechAmbientStart=start;
     window.__kuntechAmbientStatic=()=>drawAmbient(0);
@@ -357,19 +359,29 @@
   }
   function stopAmbient(){if(ambientRaf) cancelAnimationFrame(ambientRaf); ambientRaf=0;}
   function syncActivity(){
-    const sceneActive=!document.hidden&&visible, ambientActive=!document.hidden&&ambientVisible;
-    fx.paused=!sceneActive||motion.matches;
+    const sceneActive=!document.hidden&&visible&&!manuallyPaused, ambientActive=!document.hidden&&ambientVisible&&!manuallyPaused;
+    fx.paused=!sceneActive||motion.matches; fx.manuallyPaused=manuallyPaused;
     if(stage) stage.dataset.paused=String(!sceneActive||motion.matches);
-    if(!sceneActive){stopGL();if(entrance) entrance.pause();}
+    if(!sceneActive){stopGL();if(manuallyPaused){if(entrance) entrance.progress(1).pause();if(gsap) gsap.set(['.artwork-stage','#page-title','.intro','.index li'],{autoAlpha:1,clearProps:'transform'});}else if(entrance) entrance.pause();if(manuallyPaused&&!motion.matches) draw(sceneSeconds);}
     else if(motion.matches){stopGL();draw(0);}
     else{startGL();if(entrance) entrance.play();}
-    if(!ambientActive||motion.matches){stopAmbient();if(motion.matches&&window.__kuntechAmbientStatic) window.__kuntechAmbientStatic();}
+    if(!ambientActive||motion.matches){stopAmbient();if((motion.matches||manuallyPaused)&&window.__kuntechAmbientStatic) window.__kuntechAmbientStatic();}
     else if(window.__kuntechAmbientStart) window.__kuntechAmbientStart();
   }
+  function setMotionPaused(value){
+    if(motion.matches) return;
+    manuallyPaused=Boolean(value);
+    document.documentElement.dataset.motionStopped=String(manuallyPaused);
+    pointerEnabled=pointerMedia.matches&&!motion.matches&&!manuallyPaused;
+    if(!pointerEnabled) pointerTarget={x:0,y:0};
+    if(manuallyPaused&&typeof window.__kuntechClearPointerEffects==='function') window.__kuntechClearPointerEffects();
+    syncActivity();
+  }
+  window.__kuntechSetMotionPaused=setMotionPaused;
   function motionChange(event){
     fx.reducedMotion=typeof event?.matches==='boolean'?event.matches:motion.matches;
     fx.gsap=fx.reducedMotion?'reduced':(gsap?'ready':'unavailable');
-    pointerEnabled=pointerMedia.matches&&!motion.matches;
+    pointerEnabled=pointerMedia.matches&&!motion.matches&&!manuallyPaused;
     if(!pointerEnabled) pointerTarget={x:0,y:0};
     resizeGL(); syncActivity();
   }
