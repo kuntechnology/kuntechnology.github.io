@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050b16">
+  <meta name="description" content="衡域安全运营中枢，基于授权与证据的安全运营工作台。">
+  <title>态势分析 · 衡域安全运营中枢</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="src/qa.css">
+  <link rel="stylesheet" href="src/operational.css">
+  <link rel="icon" href="public/assets/favicon.svg" type="image/svg+xml">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests">
+  <script type="module" src="src/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#workspace">跳至主内容</a>
+  <div class="space-scene" aria-hidden="true"></div>
+  <div class="scene-shade" aria-hidden="true"></div>
+  <header class="topbar">
+    <div class="identity">
+      <span class="identity-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M20 5 32 12v15l-12 8-12-8V12z"/><path d="m14 17 6-4 6 4v8l-6 4-6-4z"/><path d="m14 17 6 4 6-4M20 21v8"/></svg></span>
+      <div class="identity-type"><strong>衡域</strong><span>安全运营中枢</span></div>
+    </div>
+    <div class="workspace-label"><span class="small-rule"></span>SECURITY OPERATIONS<span class="label-divider">/</span><span id="current-module-label">态势分析</span></div>
+    <div class="connection-state"><span class="status-dot"></span><span>数据接入</span><strong>未连接</strong></div>
+  </header>
+  <div id="live-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <main id="workspace" class="mission-grid" tabindex="-1">
+    <aside class="dialogue-panel" aria-labelledby="assistant-title">
+      <div class="panel-heading">
+        <div class="heading-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v12H9l-4 4z"/><path d="M9 8h6M9 12h4"/></svg></div>
+        <div><h2 id="assistant-title">安全问答</h2><span class="eyebrow">SECURITY ASSISTANT</span></div>
+        <span class="quiet-tag">未接入</span>
+      </div>
+      <div class="dialogue-content">
+        <div class="assistant-orbit" aria-hidden="true"><span></span><svg viewBox="0 0 48 48"><path d="M24 8 37 16v16L24 40 11 32V16z"/><path d="m18 23 4 4 9-9"/></svg></div>
+        <p class="dialogue-kicker">以证据为依据</p>
+        <h3>等待问答服务接入</h3>
+        <p class="dialogue-description">连接授权知识源与问答服务后，<br>在这里整理问题、查阅依据。</p>
+        <div class="assistant-status"><span class="status-line"></span><span>服务未接入，暂不可提问</span></div>
+      </div>
+      <form class="question-composer" aria-label="安全问题">
+        <label for="security-question">安全问题</label>
+        <div class="composer-field"><textarea id="security-question" rows="2" placeholder="问答服务未接入" aria-describedby="question-service-note" disabled></textarea><button type="submit" aria-label="发送问题" aria-describedby="question-service-note" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 14-7-4 14-3-6-7-1zM12 13l7-8"/></svg></button></div>
+        <p id="question-service-note" class="composer-note">服务未连接，问题不会被发送</p>
+      </form>
+    </aside>
+
+    <section class="scene-center" aria-labelledby="page-title">
+      <div class="page-heading"><p class="eyebrow">SITUATIONAL AWARENESS</p><h1 id="page-title">态势分析</h1><p class="page-subtitle">数据源与观察范围尚未配置</p></div>
+      <div class="scene-caption"><span class="caption-line"></span><span>安全运营工作台</span><span class="caption-orbit" aria-hidden="true"></span></div>
+      <div class="scope-strip"><span class="scope-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/><circle cx="12" cy="12" r="4"/></svg></span><div><span class="scope-label">当前分析范围</span><strong>等待数据源接入</strong></div><span class="scope-status">尚未建立</span></div>
+    </section>
+
+    <aside class="insight-rail" aria-labelledby="overview-title">
+      <div class="rail-heading"><div><span class="eyebrow">SITUATION OVERVIEW</span><h2 id="overview-title">安全态势概览</h2></div><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></div>
+      <section class="rail-section overview-section" aria-labelledby="data-state-title">
+        <div class="section-label"><h3 id="data-state-title">风险分布</h3><span>等待接入</span></div>
+        <div class="load-surface overview-load" aria-hidden="true"><div class="skeleton skeleton-ring"></div><div class="skeleton-lines"><span class="skeleton sk-wide"></span><span class="skeleton sk-short"></span></div><div class="skeleton-stat-row"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div></div>
+        <div class="unavailable-state overview-ready"><span class="state-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4zM7 7V4h10v3M8 11h8M8 15h5"/></svg></span><strong>安全数据源未接入</strong><p>当前无法提供风险统计</p></div>
+      </section>
+      <section class="rail-section trend-section" aria-labelledby="trend-title">
+        <div class="section-label"><h3 id="trend-title">风险变化趋势</h3><span>观察窗口未建立</span></div>
+        <div class="load-surface trend-load" aria-hidden="true"><span class="skeleton sk-wide"></span><span class="skeleton sk-medium"></span><div class="skeleton skeleton-chart"></div></div>
+        <div class="unavailable-state trend-ready"><span class="trend-empty" aria-hidden="true"><i></i><i></i><i></i></span><strong>暂无可核验趋势</strong><p>需接入授权数据并确定观察窗口</p></div>
+      </section>
+      <p class="setup-order"><strong>当前阻塞：数据源未连接</strong><span>接入后：配置统计口径 → 建立观察窗口</span></p>
+      <div class="source-ledger"><div><span>数据来源</span><strong>未连接</strong></div><div><span>统计口径</span><strong>未配置</strong></div></div>
+      <button class="rail-action" type="button" data-go="system"><span>前往数据源设置</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></button>
+    </aside>
+  </main>
+
+  <nav class="module-dock" aria-label="主导航">
+    <button type="button" class="module-link" data-module="qa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v12H9l-5 4z"/><path d="M8 8h8M8 12h5"/></svg><span>安全问答<small>服务未接入</small></span></button>
+    <button type="button" class="module-link active" data-module="situation" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg><span>态势分析<small>范围待配置</small></span></button>
+    <div class="dock-core" aria-hidden="true"><span><svg viewBox="0 0 40 40"><path d="M20 5 32 12v15l-12 8-12-8V12z"/><path d="m14 17 6 4 6-4M20 21v8"/></svg></span></div>
+    <button type="button" class="module-link" data-module="response"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 5v7l-8 6-8-6V8z"/><path d="m13 7-4 6h4l-2 5 6-8h-4z"/></svg><span>应急响应<small>授权待核验</small></span></button>
+    <button type="button" class="module-link" data-module="system"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg><span>系统管理<small>接入与权限</small></span></button>
+  </nav>
+</body>
+</html>

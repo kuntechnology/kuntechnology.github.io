@@ -1,6 +1,6 @@
 # Kuntechnology 根站首页
 
-这是 `https://kuntechnology.github.io/` 的纯静态首页，为四个内容不同的公开 GitHub Pages 项目提供统一入口。页面用原生 HTML、CSS、SVG、WebGL 与 Canvas；GSAP 以固定版本本地发布，无外部 CDN、字体或私有项目数据。
+这是 `https://kuntechnology.github.io/` 的纯静态首页，为五个内容不同的公开 GitHub Pages 项目提供统一入口。页面用原生 HTML、CSS、SVG、WebGL 与 Canvas；GSAP 以固定版本本地发布，无外部 CDN、字体或私有项目数据。
 
 ## 项目入口
 
@@ -10,6 +10,7 @@
 | 输液提醒小助手 | 输液计时与提醒页面 | https://kuntechnology.github.io/iv-infusion-helper/ |
 | 安恒信息安全服务方案 | 金融行业安全服务展示 | https://kuntechnology.github.io/Das-security/ |
 | SFTP 安全传输可视化指南 | 交互式 SFTP / SSH 加密学习页面 | https://kuntechnology.github.io/sftp-visualization-guide/ |
+| 安全运营中枢 | 纯静态安全运营界面 | https://kuntechnology.github.io/security-console/ |
 
 ## 首页视觉与性能
 
@@ -28,4 +29,4 @@ WebGL、贴图或着色器不可用时，首页显示同源 CSS / 图片静态�
 
 `assets/gsap-3.15.0.min.js` 来自 npm 官方 `gsap@3.15.0` 包。GSAP 采用 Standard “No Charge” license，允许网站使用；完整条款与限制见 [GSAP Standard License](https://gsap.com/community/standard-license/)。随仓库的 `assets/GSAP-LICENSE-NOTICE.txt` 记录版本与许可链接。
 
-GitHub Pages 从 `main` 分支根目录发布；提交后首页地址为 `https://kuntechnology.github.io/`。本仓库只管理根站，不复制、修改或发布四个项目子站内容。
+GitHub Pages 从 `main` 分支根目录发布；提交后首页地址为 `https://kuntechnology.github.io/`。本仓库只管理根站及其项目子站目录，不修改原有其他项目内容。
