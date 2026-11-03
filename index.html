@@ -100,8 +100,6 @@
     .stage-label { top: 15%; left: 7%; display: flex; align-items: center; gap: 8px; }
     .stage-label::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--blue-bright); box-shadow: 0 0 8px rgba(199, 240, 255, .8); }
     .stage-footnote { right: 8%; bottom: 14%; color: #8197a9; letter-spacing: .11em; }
-    .spacecraft { position: absolute; z-index: 4; top: 13%; right: 24%; width: clamp(120px, 15vw, 205px); height: auto; overflow: visible; opacity: .78; filter: drop-shadow(0 0 8px rgba(116, 197, 235, .28)); }
-    .spacecraft path, .spacecraft line, .spacecraft circle { vector-effect: non-scaling-stroke; }
     .art-caption { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
     .custom-cursor { position: fixed; z-index: 30; top: 0; left: 0; width: 0; height: 0; opacity: 0; pointer-events: none; transform: translate3d(var(--cursor-x, -100px), var(--cursor-y, -100px), 0); transition: opacity .18s ease; will-change: transform; }
     .custom-cursor.is-visible { opacity: 1; }
@@ -140,7 +138,6 @@
       .earth-scene { inset: 0; width: 100%; height: 100%; }
       .stage-label { top: 12%; left: 6%; }
       .stage-footnote { right: 7%; bottom: 21%; }
-      .spacecraft { top: 12%; right: 10%; width: clamp(118px, 35vw, 178px); }
       .eyebrow { margin: 0 0 17px; }
       h1 { font-size: clamp(48px, 11.4vw, 64px); line-height: 1.18; }
       .intro { margin-top: 14px; font-size: 12px; }
@@ -155,7 +152,6 @@
       .artwork-stage { width: min(calc(100vw - 64px), 540px); margin-top: -20px; margin-bottom: 8px; }
       .stage-label { top: 11%; left: 4%; font-size: 7px; }
       .stage-footnote { right: 4%; bottom: 21%; font-size: 7px; }
-      .spacecraft { width: 116px; right: 9%; }
       .index-link { min-height: 59px; grid-template-columns: 7px 29px minmax(0, 1fr) 17px; gap: 8px; }
       .index-title { font-size: 13px; }
     }
@@ -193,17 +189,6 @@
         </svg>
         <div class="globe-fallback" aria-hidden="true"><img src="/assets/earth-blue-marble.webp" alt="" fetchpriority="high" decoding="async"></div>
         <canvas class="earth-scene" id="earth-scene" aria-hidden="true"></canvas>
-        <svg class="spacecraft" viewBox="0 0 220 92" aria-hidden="true" focusable="false">
-          <g fill="none" stroke="#acd9ed" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M29 67 80 49l61-35 45-8-18 43-39 27-52-8-31 5z" stroke-width="1.15" />
-            <path d="m80 49 27 23m34-58 9 47m-91-2 33-10 14 11-31 10m57-14 45-24m-27 36 29-9" stroke-width=".8" opacity=".66" />
-            <path d="m17 72 29-8m-22 15 23-8m77-48 9-17" stroke-width=".7" opacity=".48" />
-          </g>
-          <path d="m181 7 5-1-18 43-18 12 12-22z" fill="#d8f5ff" opacity=".18" />
-          <circle cx="166" cy="48" r="2.2" fill="#c7f0ff" />
-          <circle cx="166" cy="48" r="6" fill="none" stroke="#a9ddf1" stroke-width=".7" opacity=".68" />
-          <path d="M15 25h17m-8.5-8.5v17M204 65h10m-5-5v10" fill="none" stroke="#93bfd6" stroke-width=".8" opacity=".56" />
-        </svg>
         <span class="stage-label" aria-hidden="true">PLANET / EARTH</span>
         <span class="stage-footnote" aria-hidden="true">ARTISTIC STUDY · NOT TO SCALE</span>
         <figcaption class="art-caption" id="earth-caption">以 NASA Earth Observatory 的 Blue Marble: Next Generation 全球影像为底图构建的科技蓝地球艺术场景。大气辉光、经纬网、扫描光与轨道仅为装饰示意，不提供精确地理定位或科学测量，也不代表 NASA 背书。</figcaption>
