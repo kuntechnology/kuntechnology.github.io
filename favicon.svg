@@ -1,1 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="18" fill="#174d3b"/><path d="M19 17v30m0-15 19-15M19 32l20 15m3-21h7m-7 18h7" fill="none" stroke="#d9f078" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 64">
+  <title>Kuntechnology K</title>
+  <path fill="#e9e6e0" d="M2 6h10v52H2zM18 28 40 6h14L28 32l26 26H40L18 36z"/>
+</svg>

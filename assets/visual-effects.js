@@ -230,6 +230,10 @@
   }
 
   function initAmbient(){
+    const MAX_STAR_GLINTS=3;
+    let glints=[],nextGlintAt=0;
+    Object.assign(fx,{starGlintsSpawned:0,starGlintActiveCount:0,starGlintHighWatermark:0,starGlintPeak:0,pointerGlowBaseRadius:150,pointerGlowRadius:0});
+    if(window.CSS&&typeof window.CSS.registerProperty==='function') document.documentElement.dataset.typedEffects='true';
     if(!ambientCanvas) return;
     ambientCtx=ambientCanvas.getContext('2d',{alpha:true});
     if(!ambientCtx){fx.canvas='fallback';return;}
@@ -247,6 +251,8 @@
         return {x:random(),y:random(),depth,r,alpha,phase:random()*6.28,speed:.24+depth*1.85,twinkle,twinkleSpeed:.00028+random()*.00032,twinkleAmount:.14+random()*.2};
       });
       fx.starCount=dust.length;
+      glints=[];fx.starGlintActiveCount=0;fx.starGlintPeak=0;
+      nextGlintAt=performance.now()+2200+Math.random()*3600;
     }
     function size(){
       const area=Math.max(1,innerWidth*innerHeight);
@@ -296,13 +302,46 @@
       });
       fx.cometActiveCount=comets.length;
     }
+    function drawStarGlints(now,ctx,w,h){
+      if(now>=nextGlintAt){
+        const candidates=dust.filter(point=>point.depth<.75&&!glints.some(glint=>glint.point===point));
+        if(glints.length<MAX_STAR_GLINTS&&candidates.length){
+          glints.push({point:candidates[Math.floor(Math.random()*candidates.length)],start:now,duration:1500+Math.random()*1100,ray:3+Math.random()*4});
+          fx.starGlintsSpawned++;
+        }
+        nextGlintAt=now+2200+Math.random()*3600;
+      }
+      let peak=0;
+      glints=glints.filter(glint=>{
+        const progress=(now-glint.start)/glint.duration;
+        if(progress>=1) return false;
+        const envelope=Math.pow(Math.sin(Math.PI*progress),2.4);
+        peak=Math.max(peak,envelope);
+        const point=glint.point,drift=now*.001*point.speed;
+        const x=((point.x*w+pointer.x*point.depth*12)%w+w)%w,y=((point.y*h+drift)%h+h)%h;
+        const ray=glint.ray*(.65+.35*envelope),short=ray*.54,alpha=.72*envelope;
+        const glow=ctx.createRadialGradient(x,y,0,x,y,ray*1.35);
+        glow.addColorStop(0,`rgba(176,225,249,${.09*envelope})`);glow.addColorStop(1,'rgba(176,225,249,0)');
+        ctx.fillStyle=glow;ctx.fillRect(x-ray*1.35,y-ray*1.35,ray*2.7,ray*2.7);
+        ctx.beginPath();ctx.moveTo(x,y-ray);ctx.lineTo(x+.4,y-.4);ctx.lineTo(x+short,y);ctx.lineTo(x+.4,y+.4);
+        ctx.lineTo(x,y+ray);ctx.lineTo(x-.4,y+.4);ctx.lineTo(x-short,y);ctx.lineTo(x-.4,y-.4);ctx.closePath();
+        ctx.fillStyle=`rgba(211,241,255,${alpha})`;ctx.fill();
+        ctx.beginPath();ctx.arc(x,y,.32+.28*envelope,0,Math.PI*2);ctx.fillStyle=`rgba(232,248,255,${alpha*.95})`;ctx.fill();
+        return true;
+      });
+      fx.starGlintActiveCount=glints.length;fx.starGlintPeak=peak;
+      fx.starGlintHighWatermark=Math.max(fx.starGlintHighWatermark,glints.length);
+    }
     function drawAmbient(now){
       if(!ambientCtx) return;
       const ctx=ambientCtx,w=innerWidth,h=innerHeight,reduced=motion.matches||manuallyPaused;
       updateCamera();
       ctx.clearRect(0,0,w,h);
+      fx.pointerGlowRadius=0;
       if(pointerEnabled&&!reduced){
-        const cx=w*(.5+pointer.x*.5),cy=h*(.5+pointer.y*.5),glow=ctx.createRadialGradient(cx,cy,0,cx,cy,300);
+        const radius=150*(1+.035*Math.sin(now*.00091)+.02*Math.sin(now*.00173+1.2));
+        const cx=w*(.5+pointer.x*.5),cy=h*(.5+pointer.y*.5),glow=ctx.createRadialGradient(cx,cy,0,cx,cy,radius);
+        fx.pointerGlowRadius=radius;
         glow.addColorStop(0,'rgba(111,183,224,.035)'); glow.addColorStop(1,'rgba(111,183,224,0)');
         ctx.fillStyle=glow; ctx.fillRect(0,0,w,h);
       }
@@ -314,7 +353,8 @@
         ctx.beginPath(); ctx.arc(x,y,point.r,0,Math.PI*2);
         ctx.fillStyle=`rgba(151,207,244,${point.alpha*shimmer})`; ctx.fill();
       }
-      if(!reduced) drawComets(now,ctx,w,h); else {comets=[];fx.cometActiveCount=0;}
+      if(!reduced){drawComets(now,ctx,w,h);drawStarGlints(now,ctx,w,h);}
+      else{comets=[];glints=[];fx.cometActiveCount=0;fx.starGlintActiveCount=0;fx.starGlintPeak=0;}
       fx.ambientFrames++;
     }
     function paint(now){
@@ -328,6 +368,7 @@
     function start(){
       if(motion.matches||manuallyPaused||document.hidden||!ambientVisible||ambientRaf) return;
       if(!nextCometAt||nextCometAt<performance.now()) nextCometAt=performance.now()+14000+Math.random()*26000;
+      nextGlintAt=performance.now()+2200+Math.random()*3600;
       ambientRaf=requestAnimationFrame(paint);
     }
     nextCometAt=performance.now()+14000+Math.random()*26000;
