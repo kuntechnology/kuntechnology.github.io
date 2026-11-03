@@ -6,10 +6,9 @@
 
 | 项目 | 用途 | 地址 |
 | --- | --- | --- |
-| UI 设计风格集锦 | 44 种 UI 风格、tokens、示例与提示词 | https://kuntechnology.github.io/ui-style-gallery/ |
+| UI 设计风格集锦 | 50 种 UI 风格、tokens、示例与提示词 | https://kuntechnology.github.io/ui-style-gallery/ |
 | 输液提醒小助手 | 输液计时与提醒页面 | https://kuntechnology.github.io/iv-infusion-helper/ |
 | 安恒信息安全服务方案 | 金融行业安全服务展示 | https://kuntechnology.github.io/Das-security/ |
-| SFTP 安全传输可视化指南 | 交互式 SFTP / SSH 加密学习页面 | https://kuntechnology.github.io/sftp-visualization-guide/ |
 | 安全运营中枢 | 纯静态安全运营界面 | https://kuntechnology.github.io/security-console/ |
 
 ## 首页视觉与性能
