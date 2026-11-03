@@ -20,6 +20,11 @@
       --muted: #b2bdc7;
       --dim: #83929f;
       --ground: #030609;
+      --space-star: #b9d9ed;
+      --space-spotlight: rgba(129, 191, 232, .095);
+      --space-grain-alpha: .035;
+      --spotlight-x: 50vw;
+      --spotlight-y: 50vh;
       --line: rgba(171, 197, 217, .22);
       --blue: #8ccbee;
       --blue-bright: #c7f0ff;
@@ -31,16 +36,27 @@
     html { min-width: 320px; overflow-x: clip; background: var(--ground); scroll-behavior: smooth; }
     body {
       min-width: 320px; min-height: 100svh; margin: 0; overflow-x: hidden; color: var(--ink);
-      background: radial-gradient(ellipse at 76% 60%, rgba(13, 40, 65, .13), transparent 42rem), var(--ground);
+      background: radial-gradient(ellipse at 76% 60%, rgba(16, 40, 61, .16), transparent 43rem), radial-gradient(ellipse at 26% 24%, rgba(7, 17, 29, .12), transparent 36rem), var(--ground);
       font-family: var(--sans); -webkit-font-smoothing: antialiased;
     }
+    #noise-texture, #spotlight { position: fixed; inset: 0; pointer-events: none; }
+    #noise-texture {
+      z-index: 0; opacity: var(--space-grain-alpha); background-size: 180px 180px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.62'/%3E%3C/svg%3E");
+    }
+    #spotlight {
+      z-index: 2; display: none; opacity: 0;
+      background: radial-gradient(280px circle at var(--spotlight-x) var(--spotlight-y), var(--space-spotlight), rgba(91, 151, 188, .025) 46%, transparent 100%);
+    }
+    html[data-spotlight-active="true"] #spotlight { opacity: 1; }
+    html[data-motion-stopped="true"] #spotlight { opacity: 0; }
     a { color: inherit; }
     a:focus-visible { outline: 2px solid var(--blue-bright); outline-offset: 5px; border-radius: 2px; }
     .skip-link { position: fixed; z-index: 20; top: 12px; left: 12px; padding: 11px 15px; transform: translateY(-160%); color: #07101e; background: var(--blue-bright); font-weight: 700; text-decoration: none; }
     .skip-link:focus { transform: translateY(0); }
-    .ambient { position: fixed; z-index: 0; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: .7; }
-    .pointer-trails { position: fixed; z-index: 2; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: .92; }
-    .frame { position: relative; z-index: 1; width: min(1420px, calc(100% - 88px)); margin-inline: auto; }
+    .ambient { position: fixed; z-index: 1; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: .7; }
+    .pointer-trails { position: fixed; z-index: 4; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: .92; }
+    .frame { position: relative; z-index: 3; width: min(1420px, calc(100% - 88px)); margin-inline: auto; }
     .masthead { height: 96px; display: flex; align-items: center; justify-content: space-between; }
     .wordmark { display: inline-flex; align-items: center; gap: 12px; color: #e0e5e9; text-decoration: none; }
     .wordmark-mark { font: 500 27px/1 var(--serif); letter-spacing: -.08em; color: var(--ink); }
@@ -96,10 +112,18 @@
     .earth-scene { z-index: 3; inset: 13%; width: 74%; height: 74%; opacity: 0; transform: translate3d(calc(var(--camera-x, 0px) * .42), calc(var(--camera-y, 0px) * .42), 0); transition: opacity .8s ease; }
     .artwork-stage[data-webgl="ready"] .earth-scene { opacity: 1; }
     .artwork-stage[data-webgl="ready"] .globe-fallback { opacity: 0; visibility: hidden; }
+    .planet-sparks { position: absolute; z-index: 4; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+    .planet-spark { fill: var(--space-star); opacity: .2; filter: drop-shadow(0 0 3px rgba(185, 217, 237, .55)); transform-box: fill-box; transform-origin: center; animation: planet-spark 5.2s ease-in-out infinite; }
+    .planet-spark:nth-child(2) { animation-delay: -.9s; }
+    .planet-spark:nth-child(3) { animation-delay: -2.1s; }
+    .planet-spark:nth-child(4) { animation-delay: -3.3s; }
+    .planet-spark:nth-child(5) { animation-delay: -1.5s; }
+    .planet-spark:nth-child(6) { animation-delay: -4.2s; }
+    .artwork-stage[data-paused="true"] .planet-spark { animation-play-state: paused; }
     .stage-label, .stage-footnote { position: absolute; z-index: 4; color: #a4b8c9; font: 8px/1.5 var(--mono); letter-spacing: .16em; text-transform: uppercase; pointer-events: none; }
-    .stage-label { top: 15%; left: 7%; display: flex; align-items: center; gap: 8px; }
+    .stage-label { top: 15%; left: 7%; display: flex; align-items: center; gap: 8px; color: #b5cbda; text-shadow: 0 1px 3px rgba(3, 6, 9, .96), 0 0 8px rgba(3, 6, 9, .72); }
     .stage-label::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--blue-bright); box-shadow: 0 0 8px rgba(199, 240, 255, .8); }
-    .stage-footnote { right: 8%; bottom: 14%; color: #8197a9; letter-spacing: .11em; }
+    .stage-footnote { right: 8%; bottom: 14%; color: var(--ink); letter-spacing: .11em; text-shadow: 0 1px 3px rgba(3, 6, 9, .96), 0 0 8px rgba(3, 6, 9, .72); }
     .art-caption { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
     .custom-cursor { position: fixed; z-index: 30; top: 0; left: 0; width: 0; height: 0; opacity: 0; pointer-events: none; transform: translate3d(var(--cursor-x, -100px), var(--cursor-y, -100px), 0); transition: opacity .18s ease; will-change: transform; }
     .custom-cursor.is-visible { opacity: 1; }
@@ -116,7 +140,10 @@
     html[data-motion-stopped="true"] .index-link.is-clicked .click-wave { animation: none !important; }
     html[data-motion-stopped="true"] .index-link.is-clicked .click-static { opacity: .86 !important; }
     @keyframes orbit-drift { to { stroke-dashoffset: -240; } }
+    @keyframes planet-spark { 0%, 100% { opacity: .12; transform: scale(.72); } 44% { opacity: .78; transform: scale(1.08); } 58% { opacity: .28; transform: scale(.9); } }
     @keyframes click-wave { 0% { opacity: .94; transform: translate(-50%, -50%) scale(.25); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(6.5); } }
+    @media (hover: hover) and (pointer: fine) { #spotlight { display: block; } }
+    @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) { #spotlight { display: none !important; } }
     @media (max-width: 1040px) {
       .frame { width: calc(100% - 56px); }
       .copy { width: 48%; }
@@ -159,13 +186,16 @@
       html { scroll-behavior: auto; }
       *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
       .custom-cursor { display: none !important; }
+      .planet-spark { animation: none !important; opacity: .2; }
       .index-link.is-clicked .click-static { opacity: .86 !important; }
     }
   </style>
 </head>
 <body>
   <a class="skip-link" href="#main">跳到作品索引</a>
+  <div id="noise-texture" aria-hidden="true"></div>
   <canvas class="ambient" id="ambient" aria-hidden="true"></canvas>
+  <div id="spotlight" aria-hidden="true"></div>
   <canvas class="pointer-trails" id="pointer-trails" aria-hidden="true"></canvas>
   <header class="frame masthead">
     <a class="wordmark" href="/" aria-label="Kuntechnology 首页">
@@ -189,6 +219,14 @@
         </svg>
         <div class="globe-fallback" aria-hidden="true"><img src="/assets/earth-blue-marble.webp" alt="" fetchpriority="high" decoding="async"></div>
         <canvas class="earth-scene" id="earth-scene" aria-hidden="true"></canvas>
+        <svg class="planet-sparks" viewBox="0 0 900 900" aria-hidden="true" focusable="false">
+          <circle class="planet-spark" cx="756" cy="450" r="1.35" />
+          <circle class="planet-spark" cx="603" cy="185" r="1.2" />
+          <circle class="planet-spark" cx="297" cy="185" r="1.45" />
+          <circle class="planet-spark" cx="144" cy="450" r="1.2" />
+          <circle class="planet-spark" cx="297" cy="715" r="1.3" />
+          <circle class="planet-spark" cx="603" cy="715" r="1.25" />
+        </svg>
         <span class="stage-label" aria-hidden="true">PLANET / EARTH</span>
         <span class="stage-footnote" aria-hidden="true">ARTISTIC STUDY · NOT TO SCALE</span>
         <figcaption class="art-caption" id="earth-caption">以 NASA Earth Observatory 的 Blue Marble: Next Generation 全球影像为底图构建的科技蓝地球艺术场景。大气辉光、经纬网、扫描光与轨道仅为装饰示意，不提供精确地理定位或科学测量，也不代表 NASA 背书。</figcaption>

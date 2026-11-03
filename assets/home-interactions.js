@@ -5,6 +5,7 @@
   const root = document.documentElement;
   const trailCanvas = document.getElementById('pointer-trails');
   const cursor = document.getElementById('custom-cursor');
+  const spotlight = document.getElementById('spotlight');
   const pauseButton = document.getElementById('motion-toggle');
   const pauseLabel = pauseButton?.querySelector('.motion-label');
   const links = [...document.querySelectorAll('.index-link')];
@@ -22,6 +23,49 @@
   let lastPointer = null;
   let pointerSeen = false;
   let manuallyPaused = false;
+  let lastSpotlightUpdate = -Infinity;
+  let spotlightTimer = 0;
+  let pendingSpotlight = null;
+
+  function clearSpotlight() {
+    if (spotlightTimer) window.clearTimeout(spotlightTimer);
+    spotlightTimer = 0;
+    pendingSpotlight = null;
+    root.dataset.spotlightActive = 'false';
+    lastSpotlightUpdate = -Infinity;
+  }
+
+  function applySpotlight(point, now) {
+    lastSpotlightUpdate = now;
+    root.dataset.keyboardNavigation = 'false';
+    root.style.setProperty('--spotlight-x', `${point.x}px`);
+    root.style.setProperty('--spotlight-y', `${point.y}px`);
+    root.dataset.spotlightActive = 'true';
+  }
+
+  function updateSpotlight(event, now) {
+    if (!spotlight || !finePointer.matches || motion.matches || manuallyPaused || document.hidden) return;
+    const point = { x: event.clientX, y: event.clientY };
+    const delay = 1000 / 30 - (now - lastSpotlightUpdate);
+    if (delay <= 0) {
+      if (spotlightTimer) window.clearTimeout(spotlightTimer);
+      spotlightTimer = 0;
+      pendingSpotlight = null;
+      applySpotlight(point, now);
+      return;
+    }
+    pendingSpotlight = point;
+    if (!spotlightTimer) {
+      spotlightTimer = window.setTimeout(() => {
+        spotlightTimer = 0;
+        const latest = pendingSpotlight;
+        pendingSpotlight = null;
+        if (latest && finePointer.matches && !motion.matches && !manuallyPaused && !document.hidden) {
+          applySpotlight(latest, performance.now());
+        }
+      }, delay);
+    }
+  }
 
   Object.assign(fx, {
     pointerTrailPoolSize: poolSize,
@@ -65,6 +109,7 @@
     lastEmission = 0;
     resetLinks();
     cursor?.classList.remove('is-near', 'is-press', 'is-visible');
+    clearSpotlight();
     root.dataset.customCursor = 'false';
   }
   window.__kuntechClearPointerEffects = clearPointerEffects;
@@ -230,6 +275,8 @@
 
   function handlePointerMove(event) {
     if (event.pointerType && event.pointerType !== 'mouse') return;
+    const now = performance.now();
+    updateSpotlight(event, now);
     if (!allowed()) return;
     pointerSeen = true;
     root.dataset.keyboardNavigation = 'false';
@@ -238,7 +285,7 @@
     cursor?.style.setProperty('--cursor-y', `${event.clientY}px`);
     cursor?.classList.add('is-visible');
     updateLinkResponse(event.clientX, event.clientY);
-    emitTrail(event.clientX, event.clientY, performance.now());
+    emitTrail(event.clientX, event.clientY, now);
   }
 
   function handleClick(event, link) {
@@ -300,6 +347,7 @@
   }
   root.dataset.customCursor = 'false';
   root.dataset.keyboardNavigation = 'false';
+  root.dataset.spotlightActive = 'false';
   root.dataset.motionStopped = 'false';
   bindLinks();
   updateMotionButton();
@@ -315,6 +363,7 @@
     if (event.key === 'Tab' || event.key.startsWith('Arrow')) {
       root.dataset.keyboardNavigation = 'true';
       cursor?.classList.remove('is-visible', 'is-near', 'is-press');
+      clearSpotlight();
     }
   });
   document.addEventListener('visibilitychange', () => {
