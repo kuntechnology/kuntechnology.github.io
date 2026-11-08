@@ -42,7 +42,6 @@
   const earthFragmentSource = `
     precision mediump float;
     uniform sampler2D u_map;
-    uniform float u_time;
     varying vec2 v_uv;
     varying vec3 v_normal;
     float gridLine(float value,float count,float thickness){
@@ -61,9 +60,6 @@
       float latitude=gridLine(v_uv.y,12.0,.018);
       float grid=max(longitude,latitude);
       color+=vec3(.11,.49,.79)*grid*(.08+sun*.13);
-      float sweep=fract(v_uv.y+u_time*.055);
-      float scan=1.0-smoothstep(0.0,.013,abs(sweep-.5));
-      color+=vec3(.13,.61,.98)*scan*.19;
       float rim=pow(1.0-max(n.z,0.0),2.8);
       color+=vec3(.012,.055,.11)*rim*.15;
       float glint=pow(max(dot(n,normalize(vec3(-.52,.58,.63))),0.0),28.0);
@@ -111,7 +107,6 @@
       rotation:gl.getUniformLocation(program,'u_rotation'),
       radius:gl.getUniformLocation(program,'u_radius'),
       aspect:gl.getUniformLocation(program,'u_aspect'),
-      time:gl.getUniformLocation(program,'u_time'),
       map:gl.getUniformLocation(program,'u_map')
     };
   }
@@ -150,7 +145,6 @@
     if(program.rotation) gl.uniform1f(program.rotation,seconds*.055+.42);
     if(program.radius) gl.uniform1f(program.radius,radius);
     if(program.aspect) gl.uniform1f(program.aspect,width/Math.max(1,height));
-    if(program.time) gl.uniform1f(program.time,seconds);
   }
   function draw(seconds){
     if(!gl||!earthProgram||!airProgram||!texture||!width||!height) return;
