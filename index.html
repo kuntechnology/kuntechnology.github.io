@@ -106,6 +106,7 @@
     @keyframes click-wave{0%{opacity:.94;transform:translate(-50%,-50%) scale(.25)}100%{opacity:0;transform:translate(-50%,-50%) scale(6.5)}}
     @media (hover:hover) and (pointer:fine){#spotlight{display:block}}
     @media (hover:none),(pointer:coarse),(prefers-reduced-motion:reduce){#spotlight{display:none!important}}
+    @media (min-width:1041px){.globe-fallback,.earth-scene{transform:translate3d(calc(var(--camera-x,0px)*.42),calc(var(--camera-y,0px)*.42),0) scale(1.15)}}
     @media (max-width:1040px){.frame{width:calc(100% - 56px)}.exhibition{column-gap:26px}h1{font-size:clamp(38px,5vw,52px);line-height:1.22}.artwork-stage{width:min(108%,650px)}.index-link{min-height:66px}}
     @media (max-width:760px){
       .frame{width:calc(100% - 40px)}.masthead{height:68px}.wordmark{gap:9px}.wordmark-mark{width:24px;height:28px}.wordmark-name{font-size:8px;letter-spacing:.19em}
