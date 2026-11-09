@@ -259,7 +259,7 @@
       fx.ambientDpr=scale;
       createStarfield();
       particleField?.resize(innerWidth,innerHeight,innerWidth<=760||matchMedia('(pointer: coarse)').matches);
-      particleField?.setExclusions([...document.querySelectorAll('#page-title,.intro,.eyebrow,.index-link')].map(element=>{
+      particleField?.setExclusions([...document.querySelectorAll('#page-title,.intro,.clock-row,.index-link')].map(element=>{
         const box=element.getBoundingClientRect(),pad=8;
         return {left:box.left+scrollX-pad,right:box.right+scrollX+pad,top:box.top+scrollY-pad,bottom:box.bottom+scrollY+pad};
       }));
